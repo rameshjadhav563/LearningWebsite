@@ -1,0 +1,114 @@
+@model LearningWebsite.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Create New User";
+    var managers = ViewBag.Managers as List<LearningWebsite.Models.ApplicationUser> ?? new List<LearningWebsite.Models.ApplicationUser>();
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Create New User</h1>
+            <p class="text-muted">Add a new employee, manager, or HR admin to the system</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a class="btn btn-secondary" asp-action="ManageUsers">
+                <i class="fas fa-arrow-left"></i> Back to Users
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-user-plus"></i> User Information</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-action="CreateUser">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="UserName" class="form-label">Username <span class="text-danger">*</span></label>
+                        <input asp-for="UserName" class="form-control" required />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                        <small class="form-text text-muted">Must be unique</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" id="password" name="password" class="form-control" required minlength="6" />
+                        <small class="form-text text-muted">Minimum 6 characters</small>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label">Full Name</label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" type="email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Role" class="form-label">Role <span class="text-danger">*</span></label>
+                        <select asp-for="Role" class="form-select" required>
+                            <option value="">-- Select Role --</option>
+                            <option value="Employee">Employee</option>
+                            <option value="Manager">Manager</option>
+                            <option value="HR">HR Admin</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ManagerId" class="form-label">Assign Manager (Optional)</label>
+                        <select asp-for="ManagerId" class="form-select">
+                            <option value="">-- No Manager --</option>
+                            @foreach (var manager in managers)
+                            {
+                                <option value="@manager.Id">@manager.UserName (@manager.FullName)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ManagerId" class="text-danger"></span>
+                        <small class="form-text text-muted">Only applicable for Employees</small>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-save"></i> Create User
+                        </button>
+                        <a class="btn btn-secondary btn-lg" asp-action="ManageUsers">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="card shadow mt-4">
+        <div class="card-header bg-info text-white">
+            <h6 class="mb-0"><i class="fas fa-info-circle"></i> Role Descriptions</h6>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li><strong>Employee:</strong> Can view their own learning assignments and track progress</li>
+                <li><strong>Manager:</strong> Can view team members, assign learnings, and track team progress</li>
+                <li><strong>HR Admin:</strong> Full system access - create, edit, delete users and assign roles</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

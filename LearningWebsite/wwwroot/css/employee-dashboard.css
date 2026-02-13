@@ -1,0 +1,451 @@
+/* ============================================
+   EMPLOYEE DASHBOARD - INDUSTRIAL DESIGN
+   Modern, Professional, Clean
+   ============================================ */
+
+.dashboard-container {
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px 0;
+    color: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.dashboard-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dashboard-title i {
+    font-size: 38px;
+}
+
+.dashboard-subtitle {
+    margin: 8px 0 0 0;
+    font-size: 16px;
+    opacity: 0.95;
+}
+
+/* Stat Cards */
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-left: 5px solid;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.stat-total {
+    border-left-color: #3b82f6;
+}
+
+.stat-completed {
+    border-left-color: #10b981;
+}
+
+.stat-progress {
+    border-left-color: #f59e0b;
+}
+
+.stat-notstarted {
+    border-left-color: #6b7280;
+}
+
+.stat-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+}
+
+.stat-total .stat-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.stat-completed .stat-icon {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    color: white;
+}
+
+.stat-progress .stat-icon {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.stat-notstarted .stat-icon {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: #2d3748;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #718096;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Assignments Card */
+.assignments-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.assignments-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px 30px;
+    color: white;
+}
+
+.assignments-header h5 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.assignments-body {
+    padding: 0;
+}
+
+/* Assignments Table */
+.assignments-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.assignments-table thead {
+    background: #f7fafc;
+}
+
+.assignments-table th {
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: #2d3748;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.assignments-table td {
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+
+.assignments-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.assignments-table tbody tr:hover {
+    background: #f7fafc;
+}
+
+.assignment-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+}
+
+.assignment-title i {
+    font-size: 18px;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #edf2f7;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-completed {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    color: white;
+}
+
+.status-inprogress {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.status-notstarted {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+}
+
+/* Modern Progress Bar */
+.modern-progress {
+    width: 100%;
+    height: 28px;
+    background: #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+}
+
+.modern-progress-bar {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.3s ease;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+}
+
+.modern-progress-bar.bg-success {
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.modern-progress-bar.bg-warning {
+    background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+}
+
+.modern-progress-bar.bg-danger {
+    background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+/* Days Left Badges */
+.days-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.days-overdue {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.days-today {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.days-urgent {
+    background: #fed7aa;
+    color: #ea580c;
+}
+
+.days-normal {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-training {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: white;
+}
+
+.btn-training:hover {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    transform: translateX(3px);
+    color: white;
+}
+
+.btn-update {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-update:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateX(3px);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    color: #718096;
+}
+
+.empty-state i {
+    font-size: 80px;
+    color: #cbd5e0;
+    margin-bottom: 20px;
+}
+
+.empty-state h5 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    font-size: 16px;
+    color: #718096;
+}
+
+/* Modal Customizations */
+.modal-content {
+    border-radius: 16px;
+    border: none;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 20px 25px;
+}
+
+.modal-header .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    padding: 20px 25px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .dashboard-title {
+        font-size: 24px;
+    }
+
+    .stat-card {
+        margin-bottom: 15px;
+    }
+
+    .assignments-table {
+        font-size: 13px;
+    }
+
+    .assignments-table th,
+    .assignments-table td {
+        padding: 12px 15px;
+    }
+
+    .action-buttons {
+        flex-direction: row;
+    }
+
+    .btn-action {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 20px 0;
+    }
+
+    .stat-value {
+        font-size: 28px;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+
+    /* Make table scrollable on mobile */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .assignments-table {
+        min-width: 900px;
+    }
+}

@@ -1,0 +1,14 @@
+# ⚡ MIGRATION COMMAND SCRIPT
+# Copy and paste this entire command into Package Manager Console
+
+# This single command runs all three migration steps:
+Remove-Migration; Add-Migration InitialCreate; Update-Database
+
+# Expected output:
+# Build succeeded.
+# Successfully applied migration 'InitialCreate'
+
+# If that doesn't work, try individually:
+# 1. Remove-Migration
+# 2. Add-Migration InitialCreate
+# 3. Update-Database

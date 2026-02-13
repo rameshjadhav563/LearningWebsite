@@ -1,0 +1,94 @@
+@model List<LearningWebsite.Models.AssessmentResult>
+@{
+    ViewData["Title"] = "Assessment History";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/training.css" asp-append-version="true" />
+}
+
+<div class="container mt-4">
+    <div class="training-card">
+        <div class="training-header">
+            <div class="training-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <div class="training-title-section">
+                <h1 class="training-title">Assessment History</h1>
+                <p class="mb-0" style="color: rgba(255,255,255,0.9);">
+                    View your completed assessments and review answers
+                </p>
+            </div>
+        </div>
+
+        <div class="training-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover modern-table">
+                        <thead>
+                            <tr>
+                                <th>Learning Title</th>
+                                <th>Completed Date</th>
+                                <th>Questions</th>
+                                <th>Correct</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var result in Model)
+                            {
+                                <tr>
+                                    <td><strong>@result.Learning?.Title</strong></td>
+                                    <td>@result.CompletedDate.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                    <td><span class="badge bg-info">@result.TotalQuestions</span></td>
+                                    <td><span class="badge bg-primary">@result.CorrectAnswers</span></td>
+                                    <td>
+                                        <span class="score-badge @(result.Passed ? "score-pass" : "score-fail")">
+                                            @result.Score.ToString("F1")%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if (result.Passed)
+                                        {
+                                            <span class="status-badge status-passed">
+                                                <i class="fas fa-check-circle"></i> PASSED
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-failed">
+                                                <i class="fas fa-times-circle"></i> FAILED
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <a asp-action="ReviewAssessment" asp-route-id="@result.Id" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> Review
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h5>No Assessment History</h5>
+                    <p>You haven't completed any assessments yet.</p>
+                </div>
+            }
+
+            <div class="action-section">
+                <a asp-controller="Employee" asp-action="Index" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

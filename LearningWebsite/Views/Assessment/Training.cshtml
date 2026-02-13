@@ -1,0 +1,101 @@
+@model LearningWebsite.Models.Learning
+@{
+    ViewData["Title"] = "Training - " + Model.Title;
+
+    // Format duration in industrial style
+    string FormatDuration(int hours)
+    {
+        if (hours >= 24)
+        {
+            int days = hours / 24;
+            int remainingHours = hours % 24;
+            if (remainingHours > 0)
+                return $"{days}d {remainingHours}h";
+            return $"{days}d";
+        }
+        return $"{hours}h";
+    }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/training.css" asp-append-version="true" />
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="training-card">
+                <div class="training-header">
+                    <div class="training-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="training-title-section">
+                        <h1 class="training-title">@Model.Title</h1>
+                        <div class="training-meta">
+                            <span class="meta-badge category-badge">
+                                <i class="fas fa-tag"></i> @Model.Category
+                            </span>
+                            <span class="meta-badge duration-badge">
+                                <i class="fas fa-clock"></i> @FormatDuration(Model.DurationInHours)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="training-body">
+                    <div class="description-section">
+                        <h4><i class="fas fa-align-left"></i> Description</h4>
+                        <p class="description-text">@Model.Description</p>
+                    </div>
+
+                    <div class="instructions-section">
+                        <div class="instructions-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <h5>Training Instructions</h5>
+                        </div>
+                        <ul class="instructions-list">
+                            <li><i class="fas fa-check-circle"></i> Please read through the learning material carefully</li>
+                            <li><i class="fas fa-check-circle"></i> Ensure you understand all concepts before taking the assessment</li>
+                            <li><i class="fas fa-check-circle"></i> The assessment will contain random questions from this training</li>
+                            <li><i class="fas fa-check-circle"></i> You need to score 70% or above to pass the assessment</li>
+                        </ul>
+                    </div>
+
+                    @if (ViewBag.AssessmentCompleted)
+                    {
+                        <div class="status-section @(ViewBag.AssessmentPassed ? "status-success" : "status-warning")">
+                            <div class="status-icon">
+                                <i class="fas @(ViewBag.AssessmentPassed ? "fa-trophy" : "fa-exclamation-triangle")"></i>
+                            </div>
+                            <div class="status-content">
+                                <h5>Assessment Status</h5>
+                                <p>
+                                    @if (ViewBag.AssessmentPassed)
+                                    {
+                                        <text>You have successfully completed this assessment!</text>
+                                    }
+                                    else
+                                    {
+                                        <text>You have already attempted this assessment. Please review the material and try again if needed.</text>
+                                    }
+                                </p>
+                                <a asp-action="AssessmentHistory" class="btn btn-outline-primary">
+                                    <i class="fas fa-history"></i> View Assessment History
+                                </a>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="action-section">
+                        <a asp-action="TakeAssessment" asp-route-id="@Model.Id" class="btn btn-primary btn-lg btn-start">
+                            <i class="fas fa-play-circle"></i> Start Assessment
+                        </a>
+                        <a asp-controller="Employee" asp-action="Index" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

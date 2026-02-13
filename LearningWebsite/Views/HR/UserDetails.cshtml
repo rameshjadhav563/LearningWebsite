@@ -1,0 +1,269 @@
+@model LearningWebsite.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "User Details";
+    var assignmentCount = Model.Assignments?.Count ?? 0;
+    var completedCount = Model.Assignments?.Count(a => a.Status == "Completed") ?? 0;
+    var inProgressCount = Model.Assignments?.Count(a => a.Status == "InProgress") ?? 0;
+    var notStartedCount = Model.Assignments?.Count(a => a.Status == "NotStarted") ?? 0;
+    var completionRate = assignmentCount > 0 ? (completedCount * 100 / assignmentCount) : 0;
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>User Details: @Model.UserName</h1>
+            <p class="text-muted">Complete user profile and activity</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a class="btn btn-warning" asp-action="EditUser" asp-route-id="@Model.Id">
+                <i class="fas fa-edit"></i> Edit User
+            </a>
+            <a class="btn btn-secondary" asp-action="ManageUsers">
+                <i class="fas fa-arrow-left"></i> Back to Users
+            </a>
+        </div>
+    </div>
+
+    <!-- User Info Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-primary text-white">
+            <h6 class="m-0 font-weight-bold">User Information</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="avatar-circle mb-3">
+                            <i class="fas fa-user fa-5x text-primary"></i>
+                        </div>
+                        <h5>@Model.UserName</h5>
+                        @if (Model.Role == "Employee")
+                        {
+                            <span class="badge bg-primary p-2">Employee</span>
+                        }
+                        else if (Model.Role == "Manager")
+                        {
+                            <span class="badge bg-success p-2">Manager</span>
+                        }
+                        else if (Model.Role == "HR")
+                        {
+                            <span class="badge bg-danger p-2">HR Admin</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th width="200">User ID:</th>
+                            <td>@Model.Id</td>
+                        </tr>
+                        <tr>
+                            <th>Full Name:</th>
+                            <td>@(Model.FullName ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>@(Model.Email ?? "-")</td>
+                        </tr>
+                        <tr>
+                            <th>Role:</th>
+                            <td><strong>@Model.Role</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Manager:</th>
+                            <td>
+                                @if (Model.Manager != null)
+                                {
+                                    <a asp-action="UserDetails" asp-route-id="@Model.Manager.Id">
+                                        @Model.Manager.UserName (@Model.Manager.FullName)
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-left-primary">
+                <div class="card-body">
+                    <div class="text-primary font-weight-bold text-uppercase mb-1">Total Assignments</div>
+                    <div class="h3 mb-0">@assignmentCount</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-success">
+                <div class="card-body">
+                    <div class="text-success font-weight-bold text-uppercase mb-1">Completed</div>
+                    <div class="h3 mb-0">@completedCount</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-warning">
+                <div class="card-body">
+                    <div class="text-warning font-weight-bold text-uppercase mb-1">In Progress</div>
+                    <div class="h3 mb-0">@inProgressCount</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-info">
+                <div class="card-body">
+                    <div class="text-info font-weight-bold text-uppercase mb-1">Completion Rate</div>
+                    <div class="h3 mb-0">@completionRate%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Members (if Manager) -->
+    @if (Model.Role == "Manager" && Model.TeamMembers != null && Model.TeamMembers.Any())
+    {
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 bg-success text-white">
+                <h6 class="m-0 font-weight-bold">Team Members (@Model.TeamMembers.Count)</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var member in Model.TeamMembers)
+                            {
+                                <tr>
+                                    <td><strong>@member.UserName</strong></td>
+                                    <td>@(member.FullName ?? "-")</td>
+                                    <td>@(member.Email ?? "-")</td>
+                                    <td>
+                                        <a class="btn btn-sm btn-info" asp-action="UserDetails" asp-route-id="@member.Id">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Learning Assignments -->
+    @if (Model.Assignments != null && Model.Assignments.Any())
+    {
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 bg-info text-white">
+                <h6 class="m-0 font-weight-bold">Learning Assignments (@assignmentCount)</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Learning Title</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Assigned Date</th>
+                                <th>Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var assignment in Model.Assignments.OrderBy(a => a.DueDate))
+                            {
+                                <tr>
+                                    <td><strong>@assignment.Learning?.Title</strong></td>
+                                    <td>@assignment.Learning?.Category</td>
+                                    <td>
+                                        @if (assignment.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success">Completed</span>
+                                        }
+                                        else if (assignment.Status == "InProgress")
+                                        {
+                                            <span class="badge bg-warning">In Progress</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Not Started</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px; width: 150px;">
+                                            <div class="progress-bar @(assignment.Status == "Completed" ? "bg-success" : assignment.Status == "InProgress" ? "bg-warning" : "bg-secondary")" 
+                                                 role="progressbar" 
+                                                 style="width: @(assignment.ProgressPercentage ?? 0)%">
+                                                @(assignment.ProgressPercentage ?? 0)%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@assignment.AssignedDate.ToString("MMM dd, yyyy")</td>
+                                    <td>@assignment.DueDate.ToString("MMM dd, yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Actions -->
+    <div class="card shadow">
+        <div class="card-header py-3 bg-warning">
+            <h6 class="m-0 font-weight-bold">Admin Actions</h6>
+        </div>
+        <div class="card-body">
+            <a class="btn btn-warning" asp-action="EditUser" asp-route-id="@Model.Id">
+                <i class="fas fa-edit"></i> Edit User
+            </a>
+            <a class="btn btn-danger" asp-action="DeleteUser" asp-route-id="@Model.Id">
+                <i class="fas fa-trash"></i> Delete User
+            </a>
+            <a class="btn btn-secondary" asp-action="ManageUsers">
+                <i class="fas fa-arrow-left"></i> Back to Users
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card.border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .card.border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .card.border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .card.border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .text-primary { color: #4e73df; }
+    .text-success { color: #1cc88a; }
+    .text-info { color: #36b9cc; }
+    .text-warning { color: #f6c23e; }
+    .font-weight-bold { font-weight: 700; }
+    .avatar-circle {
+        padding: 20px;
+    }
+</style>

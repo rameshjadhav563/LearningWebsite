@@ -1,0 +1,628 @@
+@model LearningWebsite.Models.AssessmentViewModel
+@{
+    ViewData["Title"] = "Assessment - " + Model.LearningTitle;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/assessment.css" asp-append-version="true" />
+}
+
+<div class="assessment-container">
+    <!-- Assessment Header -->
+    <div class="assessment-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="assessment-title">
+                        <i class="fas fa-clipboard-check"></i>
+                        <div>
+                            <h1>@Model.LearningTitle</h1>
+                            <p class="mb-0">Assessment Examination</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="assessment-timer" id="assessmentTimer">
+                        <i class="fas fa-clock"></i>
+                        <span id="timerDisplay">0m 00s</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3">
+                <div class="question-navigation sticky-top">
+                    <div class="nav-header">
+                        <h5><i class="fas fa-list-ol"></i> Questions</h5>
+                        <div class="progress-info">
+                            <span id="answeredCount">0</span>/<span>@Model.Questions.Count</span>
+                        </div>
+                    </div>
+
+                    <div class="question-grid">
+                        @for (int i = 0; i < Model.Questions.Count; i++)
+                        {
+                            <button type="button" class="question-nav-btn" data-question="@i" onclick="scrollToQuestion(@i)">
+                                <span class="question-number">@(i + 1)</span>
+                                <i class="fas fa-check check-icon"></i>
+                            </button>
+                        }
+                    </div>
+
+                    <div class="nav-footer">
+                        <div class="alert alert-info small mb-2">
+                            <i class="fas fa-info-circle"></i> Click on numbers to navigate
+                        </div>
+                        <div class="legend">
+                            <div class="legend-item">
+                                <span class="legend-box current"></span> Current
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-box answered"></span> Answered
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-box unanswered"></span> Pending
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Instructions Card -->
+                <div class="instructions-card">
+                    <div class="instructions-header">
+                        <i class="fas fa-book-reader"></i>
+                        <h5>Exam Instructions</h5>
+                    </div>
+                    <div class="instructions-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="instruction-item">
+                                    <i class="fas fa-tasks text-primary"></i>
+                                    <div>
+                                        <strong>Total Questions</strong>
+                                        <p>@Model.Questions.Count questions</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="instruction-item">
+                                    <i class="fas fa-percentage text-success"></i>
+                                    <div>
+                                        <strong>Passing Score</strong>
+                                        <p>70% or above</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="instruction-item">
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                    <div>
+                                        <strong>Important</strong>
+                                        <p>Answer all questions</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="assessment-progress">
+                    <div class="progress-label">
+                        <span>Overall Progress</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             id="progressBar" 
+                             style="width: 0%">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Questions Form -->
+                <form asp-action="SubmitAssessment" method="post" id="assessmentForm">
+                    <input type="hidden" asp-for="LearningId" />
+
+                    @for (int i = 0; i < Model.Questions.Count; i++)
+                    {
+                        var question = Model.Questions[i];
+                        <div class="question-card" data-question-index="@i" id="question-@i">
+                            <div class="question-header">
+                                <div class="question-number-badge">
+                                    <span class="badge-number">@(i + 1)</span>
+                                    <span class="badge-total">of @Model.Questions.Count</span>
+                                </div>
+                                <div class="question-status">
+                                    <span class="status-badge" id="status-@i">
+                                        <i class="fas fa-circle-notch"></i> Not Answered
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="question-body">
+                                <h4 class="question-text">@question.QuestionText</h4>
+
+                                <div class="options-container">
+                                    <div class="option-item">
+                                        <input class="option-radio" 
+                                               type="radio" 
+                                               name="Answers[@question.QuestionId]" 
+                                               value="A" 
+                                               id="q@(question.QuestionId)_a"
+                                               data-question-index="@i">
+                                        <label class="option-label" for="q@(question.QuestionId)_a">
+                                            <span class="option-letter">A</span>
+                                            <span class="option-text">@question.OptionA</span>
+                                            <i class="fas fa-check-circle option-check"></i>
+                                        </label>
+                                    </div>
+
+                                    <div class="option-item">
+                                        <input class="option-radio" 
+                                               type="radio" 
+                                               name="Answers[@question.QuestionId]" 
+                                               value="B" 
+                                               id="q@(question.QuestionId)_b"
+                                               data-question-index="@i">
+                                        <label class="option-label" for="q@(question.QuestionId)_b">
+                                            <span class="option-letter">B</span>
+                                            <span class="option-text">@question.OptionB</span>
+                                            <i class="fas fa-check-circle option-check"></i>
+                                        </label>
+                                    </div>
+
+                                    <div class="option-item">
+                                        <input class="option-radio" 
+                                               type="radio" 
+                                               name="Answers[@question.QuestionId]" 
+                                               value="C" 
+                                               id="q@(question.QuestionId)_c"
+                                               data-question-index="@i">
+                                        <label class="option-label" for="q@(question.QuestionId)_c">
+                                            <span class="option-letter">C</span>
+                                            <span class="option-text">@question.OptionC</span>
+                                            <i class="fas fa-check-circle option-check"></i>
+                                        </label>
+                                    </div>
+
+                                    <div class="option-item">
+                                        <input class="option-radio" 
+                                               type="radio" 
+                                               name="Answers[@question.QuestionId]" 
+                                               value="D" 
+                                               id="q@(question.QuestionId)_d"
+                                               data-question-index="@i">
+                                        <label class="option-label" for="q@(question.QuestionId)_d">
+                                            <span class="option-letter">D</span>
+                                            <span class="option-text">@question.OptionD</span>
+                                            <i class="fas fa-check-circle option-check"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="question-footer">
+                                @if (i > 0)
+                                {
+                                    <button type="button" class="btn btn-outline-secondary" onclick="scrollToQuestion(@(i-1))">
+                                        <i class="fas fa-chevron-left"></i> Previous
+                                    </button>
+                                }
+                                else
+                                {
+                                    <div></div>
+                                }
+
+                                @if (i < Model.Questions.Count - 1)
+                                {
+                                    <button type="button" class="btn btn-primary" onclick="scrollToQuestion(@(i+1))">
+                                        Next <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-success" onclick="reviewAnswers()">
+                                        <i class="fas fa-eye"></i> Review Answers
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Submit Section -->
+                    <div class="submit-section">
+                        <div class="submit-card">
+                            <div class="submit-header">
+                                <i class="fas fa-flag-checkered"></i>
+                                <h4>Ready to Submit?</h4>
+                            </div>
+                            <div class="submit-body">
+                                <p class="text-muted">
+                                    Make sure you have answered all questions before submitting. 
+                                    Once submitted, you cannot change your answers.
+                                </p>
+                                <div class="submit-stats">
+                                    <div class="stat-item">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span>Answered: <strong id="finalAnsweredCount">0</strong></span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="fas fa-clock text-warning"></i>
+                                        <span>Time Taken: <strong id="finalTimeTaken">0m 00s</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="submit-actions">
+                                <a asp-action="Training" asp-route-id="@Model.LearningId" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-arrow-left"></i> Back to Training
+                                </a>
+                                <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                                    <i class="fas fa-paper-plane"></i> Submit Assessment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-clipboard-list"></i> Review Your Answers
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="reviewContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Continue Editing
+                </button>
+                <button type="button" class="btn btn-success" onclick="submitAssessment()">
+                    <i class="fas fa-paper-plane"></i> Submit Now
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incomplete Assessment Confirmation Modal -->
+<div class="modal fade" id="incompleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modern-modal">
+            <div class="modal-header bg-warning text-dark border-0">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon-wrapper warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0">Incomplete Assessment</h5>
+                        <p class="modal-subtitle mb-0">Some questions are unanswered</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">You have only answered <strong id="incompleteAnsweredCount">0</strong> out of <strong id="incompleteTotalCount">0</strong> questions.</p>
+                <p class="text-muted mb-0">Are you sure you want to submit with incomplete answers? This may affect your score.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-arrow-left"></i> Go Back
+                </button>
+                <button type="button" class="btn btn-warning" onclick="proceedWithIncompleteSubmit()">
+                    <i class="fas fa-check"></i> Submit Anyway
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Final Confirmation Modal -->
+<div class="modal fade" id="finalConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modern-modal">
+            <div class="modal-header bg-gradient text-white border-0">
+                <div class="modal-title-wrapper">
+                    <div class="modal-icon-wrapper submit">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title mb-0">Submit Assessment</h5>
+                        <p class="modal-subtitle mb-0">Final confirmation required</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="confirmation-summary">
+                    <div class="summary-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Answered: <strong id="finalModalAnsweredCount">0</strong> questions</span>
+                    </div>
+                    <div class="summary-item">
+                        <i class="fas fa-clock text-info"></i>
+                        <span>Time taken: <strong id="finalModalTimeTaken">0m 00s</strong></span>
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Important:</strong> You cannot change your answers after submission.
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary btn-lg" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-success btn-lg" onclick="finalSubmit()">
+                    <i class="fas fa-paper-plane"></i> Confirm & Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let startTime = new Date();
+        let timerInterval;
+        let answeredQuestions = new Set();
+        let currentQuestionIndex = 0;
+        const totalQuestions = @Model.Questions.Count;
+
+        $(document).ready(function() {
+            initializeAssessment();
+            startTimer();
+            setupEventListeners();
+        });
+
+        function initializeAssessment() {
+            // Warn user before leaving the page
+            window.addEventListener('beforeunload', function (e) {
+                if (!$('#assessmentForm').data('submitted')) {
+                    e.preventDefault();
+                    e.returnValue = 'Are you sure you want to leave? Your progress will be lost.';
+                }
+            });
+
+            // Show only the first question
+            showQuestion(0);
+        }
+
+        function setupEventListeners() {
+            // Listen for radio button changes
+            $('.option-radio').on('change', function() {
+                const questionIndex = $(this).data('question-index');
+                handleAnswerChange(questionIndex);
+            });
+
+            // Form submission - prevent default and show modal
+            $('#assessmentForm').on('submit', function(e) {
+                e.preventDefault();
+                showSubmitConfirmation();
+            });
+        }
+
+        function showSubmitConfirmation() {
+            const answered = answeredQuestions.size;
+
+            // Update modal with current stats
+            $('#finalModalAnsweredCount').text(answered);
+            $('#finalModalTimeTaken').text($('#timerDisplay').text());
+
+            if (answered < totalQuestions) {
+                // Show incomplete warning first
+                $('#incompleteAnsweredCount').text(answered);
+                $('#incompleteTotalCount').text(totalQuestions);
+                new bootstrap.Modal(document.getElementById('incompleteModal')).show();
+            } else {
+                // Show final confirmation
+                new bootstrap.Modal(document.getElementById('finalConfirmModal')).show();
+            }
+        }
+
+        function proceedWithIncompleteSubmit() {
+            // Close incomplete modal
+            bootstrap.Modal.getInstance(document.getElementById('incompleteModal')).hide();
+
+            // Show final confirmation after a short delay
+            setTimeout(() => {
+                $('#finalModalAnsweredCount').text(answeredQuestions.size);
+                $('#finalModalTimeTaken').text($('#timerDisplay').text());
+                new bootstrap.Modal(document.getElementById('finalConfirmModal')).show();
+            }, 300);
+        }
+
+        function finalSubmit() {
+            // Mark as submitted to bypass beforeunload warning
+            $('#assessmentForm').data('submitted', true);
+            window.removeEventListener('beforeunload', function() {});
+
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('finalConfirmModal')).hide();
+
+            // Submit form after modal closes
+            setTimeout(() => {
+                document.getElementById('assessmentForm').submit();
+            }, 300);
+        }
+
+        function handleAnswerChange(questionIndex) {
+            // Mark question as answered
+            answeredQuestions.add(questionIndex);
+
+            // Update status badge
+            $(`#status-${questionIndex}`).html('<i class="fas fa-check-circle"></i> Answered').removeClass('status-pending').addClass('status-answered');
+
+            // Update navigation button
+            $(`.question-nav-btn[data-question="${questionIndex}"]`).addClass('answered');
+
+            // Update progress
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answered = answeredQuestions.size;
+            const percent = Math.round((answered / totalQuestions) * 100);
+
+            $('#answeredCount, #finalAnsweredCount').text(answered);
+            $('#progressPercent').text(percent + '%');
+            $('#progressBar').css('width', percent + '%');
+
+            if (answered === totalQuestions) {
+                $('#progressBar').removeClass('bg-primary').addClass('bg-success');
+                showSuccess('Great! You have answered all questions.');
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                const elapsed = Math.floor((new Date() - startTime) / 1000);
+                const hours = Math.floor(elapsed / 3600);
+                const minutes = Math.floor((elapsed % 3600) / 60);
+                const seconds = elapsed % 60;
+
+                let timeStr;
+                if (hours > 0) {
+                    // Industrial format: 2h 35m 42s
+                    timeStr = `${hours}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+                } else {
+                    // Standard format for under 1 hour: 35m 42s
+                    timeStr = `${minutes}m ${String(seconds).padStart(2, '0')}s`;
+                }
+
+                $('#timerDisplay, #finalTimeTaken').text(timeStr);
+            }, 1000);
+        }
+
+        function showQuestion(index) {
+            if (index < 0 || index >= totalQuestions) {
+                return;
+            }
+
+            // Hide all questions
+            $('.question-card').removeClass('active-question current-question');
+
+            // Show the selected question
+            const questionCard = $(`#question-${index}`);
+            questionCard.addClass('active-question current-question');
+
+            // Update navigation buttons state
+            $('.question-nav-btn').removeClass('current');
+            $(`.question-nav-btn[data-question="${index}"]`).addClass('current');
+
+            // Show/hide submit section based on whether we're on the last question
+            if (index === totalQuestions - 1) {
+                $('.submit-section').addClass('show-submit');
+            } else {
+                $('.submit-section').removeClass('show-submit');
+            }
+
+            // Scroll to top of content area smoothly
+            $('html, body').animate({
+                scrollTop: $('.assessment-progress').offset().top - 120
+            }, 400);
+
+            // Update current index
+            currentQuestionIndex = index;
+        }
+
+        function scrollToQuestion(index) {
+            showQuestion(index);
+        }
+
+        function reviewAnswers() {
+            let reviewHtml = '<div class="review-summary">';
+
+            for (let i = 0; i < totalQuestions; i++) {
+                const isAnswered = answeredQuestions.has(i);
+                const status = isAnswered ? 
+                    '<span class="badge bg-success"><i class="fas fa-check"></i> Answered</span>' : 
+                    '<span class="badge bg-danger"><i class="fas fa-times"></i> Not Answered</span>';
+
+                reviewHtml += `
+                    <div class="review-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>Question ${i + 1}</strong>
+                            ${status}
+                        </div>
+                    </div>
+                `;
+            }
+
+            reviewHtml += '</div>';
+
+            if (answeredQuestions.size < totalQuestions) {
+                reviewHtml += `
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        <strong>Warning:</strong> You have ${totalQuestions - answeredQuestions.size} unanswered question(s).
+                    </div>
+                `;
+            } else {
+                reviewHtml += `
+                    <div class="alert alert-success mt-3">
+                        <i class="fas fa-check-circle"></i> 
+                        <strong>Perfect!</strong> You have answered all questions. You're ready to submit!
+                    </div>
+                `;
+            }
+
+            $('#reviewContent').html(reviewHtml);
+            new bootstrap.Modal(document.getElementById('reviewModal')).show();
+        }
+
+        function submitAssessment() {
+            // Close review modal
+            bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
+
+            // Show final confirmation after modal closes
+            setTimeout(() => {
+                showSubmitConfirmation();
+            }, 300);
+        }
+
+        // Keyboard shortcuts
+        $(document).on('keydown', function(e) {
+            // Prevent shortcuts when typing in input fields
+            if ($(e.target).is('input, textarea')) return;
+
+            // Arrow keys navigation
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (currentQuestionIndex < totalQuestions - 1) {
+                    showQuestion(currentQuestionIndex + 1);
+                }
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (currentQuestionIndex > 0) {
+                    showQuestion(currentQuestionIndex - 1);
+                }
+            }
+
+            // Number keys (1-9) for quick navigation
+            if (e.key >= '1' && e.key <= '9') {
+                const questionNum = parseInt(e.key) - 1;
+                if (questionNum < totalQuestions) {
+                    showQuestion(questionNum);
+                }
+            }
+        });
+    </script>
+}

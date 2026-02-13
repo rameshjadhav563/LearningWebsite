@@ -1,0 +1,20 @@
+HR Has admin rights he can create employees and edit,Read and delete and assign roles,
+Manager, employees
+
+
+
+Hr will create Employee and Manager.
+HR and Manager will assinged learning task to Employee. Assigned Learnings with status, Assigned and due dates
+Give me HR Flow document ,Manager flow , and Employee flow like functioanal documents
+
+
+
+
+
+
+
+
+HR:
+1.	Dashboard with Graph or Metric table
+2.	Assigned Learnings with status, Assigned and due dates
+3.	HR Has admin rights he can create employees and edit,Read and delete and assign roles.

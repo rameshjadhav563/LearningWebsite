@@ -1,0 +1,307 @@
+/* ============================================
+   PRINT STYLES - WORKS WITH OR WITHOUT BACKGROUND GRAPHICS
+   Single Page, Landscape, Professional
+   ============================================ */
+
+@media print {
+    /* Force color printing */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    /* Reset body */
+    body {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .certificate-view-container {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Hide navigation and buttons */
+    .certificate-actions-bottom,
+    nav,
+    footer,
+    .navbar,
+    .btn,
+    button,
+    header,
+    .toast,
+    .container > *:not(.certificate-display) {
+        display: none !important;
+    }
+
+    /* Certificate container */
+    .certificate-display {
+        box-shadow: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+        page-break-before: avoid !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    /* Main border - SOLID fallback + gradient */
+    .certificate-border {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        padding: 25px !important;
+        margin: 0 auto !important;
+        max-width: 95% !important;
+        display: block !important;
+        visibility: visible !important;
+        position: relative !important;
+        
+        /* SOLID border as fallback */
+        border: 10px solid #667eea !important;
+        
+        /* Gradient border (shows if background graphics ON) */
+        border-image: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f59e0b 100%) 1 !important;
+        
+        /* Scale for landscape */
+        transform: scale(0.92) !important;
+        transform-origin: center center !important;
+    }
+
+    .certificate-inner {
+        padding: 25px !important;
+        margin: 0 !important;
+        display: block !important;
+        visibility: visible !important;
+        background: white !important;
+    }
+
+    /* Corner decorations - SOLID fallback */
+    .certificate-corner {
+        position: absolute !important;
+        width: 40px !important;
+        height: 40px !important;
+        border: 5px solid #f59e0b !important;
+        display: block !important;
+    }
+
+    .corner-tl {
+        top: -5px !important;
+        left: -5px !important;
+        border-right: none !important;
+        border-bottom: none !important;
+    }
+
+    .corner-tr {
+        top: -5px !important;
+        right: -5px !important;
+        border-left: none !important;
+        border-bottom: none !important;
+    }
+
+    .corner-bl {
+        bottom: -5px !important;
+        left: -5px !important;
+        border-right: none !important;
+        border-top: none !important;
+    }
+
+    .corner-br {
+        bottom: -5px !important;
+        right: -5px !important;
+        border-left: none !important;
+        border-top: none !important;
+    }
+
+    /* Header section */
+    .cert-header {
+        margin-bottom: 30px !important;
+        display: block !important;
+        text-align: center !important;
+    }
+
+    .cert-logo {
+        font-size: 50px !important;
+        margin-bottom: 15px !important;
+        color: #667eea !important;
+        display: block !important;
+    }
+
+    .cert-main-title {
+        font-size: 36px !important;
+        margin: 0 !important;
+        color: #2d3748 !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+    }
+
+    .cert-subtitle {
+        font-size: 16px !important;
+        margin-top: 10px !important;
+        color: #718096 !important;
+    }
+
+    /* Body section */
+    .cert-body {
+        margin: 35px 0 !important;
+        display: block !important;
+        text-align: center !important;
+    }
+
+    .cert-presented-to {
+        font-size: 15px !important;
+        margin: 0 !important;
+        color: #718096 !important;
+    }
+
+    .cert-recipient-name {
+        font-size: 40px !important;
+        margin: 20px 0 !important;
+        color: #2d3748 !important;
+        font-weight: 800 !important;
+        font-family: 'Georgia', serif !important;
+    }
+
+    .cert-has-completed {
+        font-size: 15px !important;
+        margin: 20px 0 10px 0 !important;
+        color: #718096 !important;
+    }
+
+    .cert-course-name {
+        font-size: 28px !important;
+        margin: 20px 0 !important;
+        color: #667eea !important;
+        font-weight: 700 !important;
+    }
+
+    .cert-description {
+        font-size: 15px !important;
+        margin: 20px auto !important;
+        color: #4a5568 !important;
+        max-width: 600px !important;
+        line-height: 1.6 !important;
+    }
+
+    /* Score display */
+    .cert-score-display {
+        margin: 30px 0 !important;
+        display: block !important;
+        text-align: center !important;
+    }
+
+    .score-badge-large {
+        display: inline-block !important;
+    }
+
+    .score-circle-large {
+        width: 120px !important;
+        height: 120px !important;
+        border-radius: 50% !important;
+        font-size: 40px !important;
+        margin: 0 auto 15px !important;
+        color: white !important;
+        font-weight: 800 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+        /* SOLID background as fallback */
+        background: #10b981 !important;
+        
+        /* Gradient (shows if background graphics ON) */
+        background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
+        
+        /* Box shadow for depth */
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+        
+        /* Border fallback */
+        border: 3px solid #10b981 !important;
+    }
+
+    .score-label {
+        font-size: 13px !important;
+        color: #718096 !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
+
+    /* Footer section */
+    .cert-footer {
+        margin-top: 35px !important;
+        padding-top: 25px !important;
+        border-top: 2px solid #e2e8f0 !important;
+        display: block !important;
+        text-align: center !important;
+    }
+
+    .cert-footer-row {
+        margin-bottom: 20px !important;
+        display: flex !important;
+        justify-content: space-around !important;
+    }
+
+    .cert-footer-item {
+        text-align: center !important;
+    }
+
+    .cert-footer-label {
+        font-size: 12px !important;
+        margin-bottom: 8px !important;
+        color: #718096 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
+
+    .cert-footer-value {
+        font-size: 15px !important;
+        color: #2d3748 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Seal - SOLID fallback */
+    .cert-seal {
+        padding: 12px 30px !important;
+        font-size: 15px !important;
+        color: white !important;
+        font-weight: 700 !important;
+        border-radius: 50px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        
+        /* SOLID background as fallback */
+        background: #667eea !important;
+        
+        /* Gradient (shows if background graphics ON) */
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        
+        /* Border fallback */
+        border: 2px solid #667eea !important;
+    }
+
+    .cert-seal i {
+        font-size: 22px !important;
+    }
+
+    /* Page settings - LANDSCAPE for better fit */
+    @page {
+        size: A4 landscape;
+        margin: 15mm 20mm;
+    }
+
+    /* Ensure everything is visible */
+    body, html {
+        overflow: visible !important;
+        height: auto !important;
+    }
+}
+
+/* End of print styles */

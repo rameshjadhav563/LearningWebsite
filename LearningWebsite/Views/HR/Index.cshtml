@@ -1,0 +1,1043 @@
+@using LearningWebsite.Models
+
+@{
+    ViewData["Title"] = "HR Analytics Dashboard";
+    var totalUsers = ViewBag.TotalUsers as int? ?? 0;
+    var totalEmployees = ViewBag.TotalEmployees as int? ?? 0;
+    var totalManagers = ViewBag.TotalManagers as int? ?? 0;
+    var totalHR = ViewBag.TotalHR as int? ?? 0;
+    var users = ViewBag.Users as List<ApplicationUser> ?? new List<ApplicationUser>();
+    var employees = ViewBag.Employees as List<ApplicationUser> ?? new List<ApplicationUser>();
+    
+    var totalAssignments = ViewBag.TotalAssignments as int? ?? 0;
+    var completedAssignments = ViewBag.CompletedAssignments as int? ?? 0;
+    var inProgressAssignments = ViewBag.InProgressAssignments as int? ?? 0;
+    var notStartedAssignments = ViewBag.NotStartedAssignments as int? ?? 0;
+    var completionRate = ViewBag.CompletionRate as int? ?? 0;
+    
+    var allAssignments = ViewBag.AllAssignments as List<LearningAssignment> ?? new List<LearningAssignment>();
+    var allLearnings = ViewBag.AllLearnings as List<Learning> ?? new List<Learning>();
+    var categoryStats = ViewBag.CategoryStats as dynamic;
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">📊 HR Analytics Dashboard</h1>
+            <p class="text-muted lead">Welcome, <strong>@User.Identity?.Name</strong> - Organization Learning Overview</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle"></i> @TempData["InfoMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Key Metrics Row -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card border-left-primary shadow h-100">
+                <div class="card-body">
+                    <div class="text-primary font-weight-bold text-uppercase mb-1" style="font-size: 0.75rem;">Total Users</div>
+                    <div class="h2 mb-0 font-weight-bold text-gray-800">@totalUsers</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-left-success shadow h-100">
+                <div class="card-body">
+                    <div class="text-success font-weight-bold text-uppercase mb-1" style="font-size: 0.75rem;">Employees</div>
+                    <div class="h2 mb-0 font-weight-bold text-gray-800">@totalEmployees</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-left-info shadow h-100">
+                <div class="card-body">
+                    <div class="text-info font-weight-bold text-uppercase mb-1" style="font-size: 0.75rem;">Total Assignments</div>
+                    <div class="h2 mb-0 font-weight-bold text-gray-800">@totalAssignments</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-left-success shadow h-100">
+                <div class="card-body">
+                    <div class="text-success font-weight-bold text-uppercase mb-1" style="font-size: 0.75rem;">Completed</div>
+                    <div class="h2 mb-0 font-weight-bold text-gray-800">@completedAssignments</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-left-warning shadow h-100">
+                <div class="card-body">
+                    <div class="text-warning font-weight-bold text-uppercase mb-1" style="font-size: 0.75rem;">In Progress</div>
+                    <div class="h2 mb-0 font-weight-bold text-gray-800">@inProgressAssignments</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card border-left-secondary shadow h-100">
+                <div class="card-body">
+                    <div class="text-secondary font-weight-bold text-uppercase mb-1" style="font-size: 0.75rem;">Completion Rate</div>
+                    <div class="h2 mb-0 font-weight-bold text-gray-800">@completionRate%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold"><i class="fas fa-bolt"></i> Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <button class="btn btn-success btn-lg w-100" data-bs-toggle="modal" data-bs-target="#assignLearningModal">
+                                <i class="fas fa-plus-circle"></i> Assign Learning
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a class="btn btn-warning btn-lg w-100" asp-action="CreateUser">
+                                <i class="fas fa-user-plus"></i> Create User
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a class="btn btn-info btn-lg w-100" asp-action="ManageUsers">
+                                <i class="fas fa-users-cog"></i> Manage Users
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <button class="btn btn-secondary btn-lg w-100" onclick="printDashboard()">
+                                <i class="fas fa-print"></i> Print Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Assignment Status Distribution -->
+        <div class="col-md-6">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 bg-info text-white">
+                    <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-pie"></i> Assignment Status Distribution</h6>
+                </div>
+                <div class="card-body">
+                    @if (totalAssignments > 0)
+                    {
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center my-5">
+                            <i class="fas fa-chart-pie fa-3x mb-3"></i>
+                            <h5>No Assignment Data</h5>
+                            <p>Assign learnings to employees to see the status distribution chart.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Rate by Category -->
+        <div class="col-md-6">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 bg-success text-white">
+                    <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-bar"></i> Completion Rate by Category</h6>
+                </div>
+                <div class="card-body">
+                    @if (totalAssignments > 0)
+                    {
+                        <div style="position: relative; height: 300px;">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center my-5">
+                            <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                            <h5>No Category Data</h5>
+                            <p>Assign learnings to employees to see completion rates by category.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Assignments Table -->
+    <div class="card shadow">
+        <div class="card-header py-3 bg-warning">
+            <h6 class="m-0 font-weight-bold"><i class="fas fa-table"></i> All Learning Assignments (@allAssignments.Count)</h6>
+        </div>
+        <div class="card-body">
+            @if (allAssignments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="assignmentsTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Employee</th>
+                                <th>Learning Title</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Assigned Date</th>
+                                <th>Due Date</th>
+                                <th>Days Left</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var assignment in allAssignments)
+                            {
+                                var daysLeft = (assignment.DueDate - DateTime.Now).Days;
+                                var daysLeftClass = daysLeft < 0 ? "text-danger fw-bold" : daysLeft < 7 ? "text-warning fw-bold" : "text-success";
+                                
+                                <tr>
+                                    <td><strong>@assignment.User?.UserName</strong></td>
+                                    <td>@assignment.Learning?.Title</td>
+                                    <td><span class="badge bg-secondary">@assignment.Learning?.Category</span></td>
+                                    <td>
+                                        @if (assignment.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Completed</span>
+                                        }
+                                        else if (assignment.Status == "InProgress")
+                                        {
+                                            <span class="badge bg-warning"><i class="fas fa-spinner"></i> In Progress</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary"><i class="fas fa-clock"></i> Not Started</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px; width: 120px;">
+                                            <div class="progress-bar @(assignment.Status == "Completed" ? "bg-success" : assignment.Status == "InProgress" ? "bg-warning" : "bg-secondary")" 
+                                                 role="progressbar" 
+                                                 style="width: @(assignment.ProgressPercentage ?? 0)%"
+                                                 aria-valuenow="@(assignment.ProgressPercentage ?? 0)" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                @(assignment.ProgressPercentage ?? 0)%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@assignment.AssignedDate.ToString("MMM dd, yyyy")</td>
+                                    <td>@assignment.DueDate.ToString("MMM dd, yyyy")</td>
+                                    <td class="@daysLeftClass">
+                                        @if (daysLeft < 0)
+                                        {
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <strong>@Math.Abs(daysLeft) days overdue</strong>
+                                        }
+                                        else if (daysLeft < 7)
+                                        {
+                                            <i class="fas fa-clock"></i>
+                                            <strong>@daysLeft days left</strong>
+                                        }
+                                        else
+                                        {
+                                            <i class="fas fa-calendar-check"></i>
+                                            <span>@daysLeft days</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-3x mb-3"></i>
+                    <h5>No learning assignments yet</h5>
+                    <p>Start by assigning learnings to employees using the "Assign Learning" button above.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Assign Learning Modal -->
+<div class="modal fade" id="assignLearningModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" asp-action="AssignLearningToEmployee">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fas fa-plus-circle"></i> Assign Learning to Employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Hold <kbd>Ctrl</kbd> (Windows) or <kbd>Cmd</kbd> (Mac) to select multiple learnings
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="employeeId" class="form-label">Select Employee <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-lg" id="employeeId" name="employeeId" required>
+                            <option value="">-- Choose an employee --</option>
+                            @foreach (var emp in employees)
+                            {
+                                <option value="@emp.Id">@emp.UserName @(emp.FullName != null ? $"({emp.FullName})" : "")</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Category Filter Buttons -->
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-filter"></i> Filter by Category:</label>
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-outline-primary" data-category="All" onclick="filterByCategory('All')">
+                                <i class="fas fa-th"></i> All (@allLearnings.Count)
+                            </button>
+                            @{
+                                var categoryGroups = allLearnings.GroupBy(l => l.Category).OrderBy(g => g.Key);
+                                foreach (var categoryGroup in categoryGroups)
+                                {
+                                    <button type="button" class="btn btn-outline-info" data-category="@categoryGroup.Key" onclick="filterByCategory('@categoryGroup.Key')">
+                                        <i class="fas fa-tag"></i> @categoryGroup.Key (@categoryGroup.Count())
+                                    </button>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="learningIds" class="form-label">
+                            Select Learnings <span class="text-danger">*</span> 
+                            <span class="badge bg-secondary" id="currentCategoryBadge">All Categories</span>
+                        </label>
+                        <select class="form-select" id="learningIds" name="learningIds" multiple size="8" required style="height: 250px;">
+                            @foreach (var learning in allLearnings)
+                            {
+                                <option value="@learning.Id" data-category="@learning.Category">
+                                    @learning.Title <span class="text-muted">(@learning.Category)</span>
+                                </option>
+                            }
+                        </select>
+                        <small class="form-text text-muted">
+                            <strong>Selected:</strong> <span id="selectedLearningCount">0</span> learning(s) | 
+                            <strong>Showing:</strong> <span id="visibleLearningCount">@allLearnings.Count</span> learning(s)
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dueDate" class="form-label">Due Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control form-control-lg" id="dueDate" name="dueDate" 
+                               value="@DateTime.Now.AddDays(30).ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <!-- Quick Select Buttons -->
+                    <div class="mb-3">
+                        <label class="form-label">Quick Select:</label>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllLearnings">
+                                <i class="fas fa-check-double"></i> Select All Visible
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success" id="selectByCategory">
+                                <i class="fas fa-layer-group"></i> Select Current Category
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="clearAllLearnings">
+                                <i class="fas fa-times"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success btn-lg" id="assignLearningBtn" disabled>
+                        <i class="fas fa-check"></i> Assign to Employee
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        // Assignment Status Distribution Chart (Doughnut)
+        const statusCtx = document.getElementById('statusChart');
+        if (statusCtx) {
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Not Started'],
+                    datasets: [{
+                        data: [@completedAssignments, @inProgressAssignments, @notStartedAssignments],
+                        backgroundColor: ['#1cc88a', '#f6c23e', '#858796'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = @totalAssignments;
+                                    const value = context.parsed;
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return context.label + ': ' + value + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Category Completion Rate Chart (Bar)
+        const categoryCtx = document.getElementById('categoryChart');
+        if (categoryCtx) {
+            @if (categoryStats != null)
+            {
+                var categoryLabels = new List<string>();
+                var categoryData = new List<int>();
+                foreach (var stat in categoryStats)
+                {
+                    categoryLabels.Add(stat.Category ?? "Unknown");
+                    categoryData.Add(stat.CompletionRate);
+                }
+                var categoryLabelsJson = System.Text.Json.JsonSerializer.Serialize(categoryLabels);
+                var categoryDataJson = System.Text.Json.JsonSerializer.Serialize(categoryData);
+                @:const categoryLabelsData = @Html.Raw(categoryLabelsJson);
+                @:const categoryRatesData = @Html.Raw(categoryDataJson);
+            }
+            else
+            {
+                @:const categoryLabelsData = ['Technical', 'Soft Skills', 'Leadership'];
+                @:const categoryRatesData = [0, 0, 0];
+            }
+
+            new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: categoryLabelsData,
+                    datasets: [{
+                        label: 'Completion Rate (%)',
+                        data: categoryRatesData,
+                        backgroundColor: '#4e73df',
+                        borderColor: '#224abe',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize DataTable for assignments
+        $(document).ready(function() {
+            $('#assignmentsTable').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                "order": [[5, "desc"]], // Sort by Assigned Date descending
+                "language": {
+                    "search": "Search assignments:",
+                    "lengthMenu": "Show _MENU_ assignments per page",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ assignments",
+                    "infoEmpty": "No assignments found",
+                    "zeroRecords": "No matching assignments found"
+                },
+                "columnDefs": [
+                    { "orderable": false, "targets": 4 } // Disable sorting on Progress column
+                ]
+            });
+        });
+
+        // Print function - shows all rows and adds print date
+        function printDashboard() {
+            // Add print date to container
+            const container = document.querySelector('.container-fluid');
+            const printDate = new Date().toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            container.setAttribute('data-print-date', printDate);
+
+            // Get DataTable instance
+            const table = $('#assignmentsTable').DataTable();
+
+            // Store original settings
+            const originalPageLength = table.page.len();
+            const originalSearchValue = table.search();
+
+            // Clear any search filters and show ALL rows
+            table.search('').draw();
+            table.page.len(-1).draw();
+
+            // Force display all rows by removing DataTables display:none
+            $('#assignmentsTable tbody tr').each(function() {
+                $(this).show().css('display', 'table-row');
+            });
+
+            console.log('Total rows in table:', table.rows().count());
+            console.log('Preparing to print...');
+
+            // Wait for table to fully render all rows
+            setTimeout(function() {
+                // Double-check all rows are visible
+                const totalRows = $('#assignmentsTable tbody tr').length;
+                console.log('Visible rows before print:', totalRows);
+
+                // Trigger print
+                window.print();
+
+                // Restore original settings after print dialog closes
+                setTimeout(function() {
+                    table.search(originalSearchValue);
+                    table.page.len(originalPageLength).draw();
+                    console.log('Restored to original view');
+                }, 500);
+            }, 500);
+        }
+
+        // Learning selection counter
+        const learningSelect = document.getElementById('learningIds');
+        let currentCategory = 'All';
+
+        if (learningSelect) {
+            learningSelect.addEventListener('change', function() {
+                const selected = this.selectedOptions.length;
+                document.getElementById('selectedLearningCount').textContent = selected;
+                document.getElementById('assignLearningBtn').disabled = selected === 0;
+            });
+        }
+
+        // Category filtering function
+        function filterByCategory(category) {
+            currentCategory = category;
+            const select = document.getElementById('learningIds');
+            const options = Array.from(select.options);
+            let visibleCount = 0;
+
+            // Update category badge
+            document.getElementById('currentCategoryBadge').textContent = 
+                category === 'All' ? 'All Categories' : category;
+
+            // Update button active state
+            document.querySelectorAll('[data-category]').forEach(btn => {
+                if (btn.getAttribute('data-category') === category) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Show/hide options based on category
+            options.forEach(option => {
+                const optionCategory = option.getAttribute('data-category');
+                if (category === 'All' || optionCategory === category) {
+                    option.style.display = '';
+                    visibleCount++;
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+
+            // Update visible count
+            document.getElementById('visibleLearningCount').textContent = visibleCount;
+
+            // Clear any selections of hidden items
+            options.forEach(option => {
+                if (option.style.display === 'none' && option.selected) {
+                    option.selected = false;
+                }
+            });
+
+            // Trigger change event to update counters
+            select.dispatchEvent(new Event('change'));
+        }
+
+        // Quick select buttons
+        const selectAllBtn = document.getElementById('selectAllLearnings');
+        if (selectAllBtn) {
+            selectAllBtn.addEventListener('click', function() {
+                const select = document.getElementById('learningIds');
+                // Only select visible options
+                Array.from(select.options).forEach(option => {
+                    if (option.style.display !== 'none') {
+                        option.selected = true;
+                    }
+                });
+                select.dispatchEvent(new Event('change'));
+            });
+        }
+
+        // Select by current category button
+        const selectByCategoryBtn = document.getElementById('selectByCategory');
+        if (selectByCategoryBtn) {
+            selectByCategoryBtn.addEventListener('click', function() {
+                const select = document.getElementById('learningIds');
+                Array.from(select.options).forEach(option => {
+                    const optionCategory = option.getAttribute('data-category');
+                    if (currentCategory === 'All' || optionCategory === currentCategory) {
+                        option.selected = true;
+                    }
+                });
+                select.dispatchEvent(new Event('change'));
+            });
+        }
+
+        const clearAllBtn = document.getElementById('clearAllLearnings');
+        if (clearAllBtn) {
+            clearAllBtn.addEventListener('click', function() {
+                const select = document.getElementById('learningIds');
+                Array.from(select.options).forEach(option => option.selected = false);
+                select.dispatchEvent(new Event('change'));
+            });
+        }
+
+        // Reset filter when modal is closed
+        const assignLearningModal = document.getElementById('assignLearningModal');
+        if (assignLearningModal) {
+            assignLearningModal.addEventListener('hidden.bs.modal', function() {
+                filterByCategory('All');
+                document.getElementById('clearAllLearnings').click();
+            });
+        }
+    </script>
+}
+
+<style>
+    .card.border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .card.border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .card.border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .card.border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .card.border-left-secondary {
+        border-left: 0.25rem solid #858796 !important;
+    }
+    
+    .text-primary { color: #4e73df !important; }
+    .text-success { color: #1cc88a !important; }
+    .text-info { color: #36b9cc !important; }
+    .text-warning { color: #f6c23e !important; }
+    .text-gray-800 { color: #5a5c69 !important; }
+    .font-weight-bold { font-weight: 700 !important; }
+    
+    .card {
+        border-radius: 0.35rem;
+    }
+    
+    .shadow {
+        box-shadow: 0 .15rem 1.75rem 0 rgba(58,59,69,.15)!important;
+    }
+
+    @@media print {
+        /* Hide only interactive elements, not content */
+        .btn, .modal, .alert-dismissible .btn-close,
+        nav, .navbar, header, footer,
+        .dataTables_filter, .dataTables_length,
+        .dataTables_info, .dataTables_paginate,
+        .dataTables_wrapper > .row:first-child,
+        .dataTables_wrapper > .row:last-child {
+            display: none !important;
+        }
+
+        /* Hide Quick Actions card */
+        .card:has(.bg-primary.text-white) {
+            display: none !important;
+        }
+
+        /* Page setup - LANDSCAPE with better margins */
+        @@page {
+            size: A4 landscape;
+            margin: 1.2cm 1cm;
+        }
+
+        html, body {
+            width: 100%;
+            background: white !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 9pt;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Container adjustments */
+        .container-fluid {
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 10pt !important;
+            margin: 0 !important;
+        }
+
+        /* Dashboard Header - Compact */
+        .display-4 {
+            font-size: 20pt !important;
+            font-weight: 700 !important;
+            margin-bottom: 4pt !important;
+            text-align: center;
+            color: #2c3e50 !important;
+            page-break-after: avoid;
+        }
+
+        .lead {
+            font-size: 9pt !important;
+            margin-bottom: 10pt !important;
+            text-align: center;
+            color: #5a5c69 !important;
+            page-break-after: avoid;
+        }
+
+        /* Hide alerts in print */
+        .alert {
+            display: none !important;
+        }
+
+        /* === METRICS CARDS - ONE LINE === */
+        .row.mb-4 {
+            page-break-inside: avoid !important;
+        }
+
+        .row.mb-4:first-of-type {
+            margin-bottom: 10pt !important;
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            gap: 4pt;
+        }
+
+        .row.mb-4:first-of-type .col-md-2 {
+            flex: 1 1 16.66% !important;
+            max-width: 16.66% !important;
+            min-width: 0 !important;
+        }
+
+        .row.mb-4:first-of-type .card {
+            page-break-inside: avoid !important;
+            box-shadow: 0 1pt 2pt rgba(0,0,0,0.1) !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 3pt !important;
+            margin: 0 !important;
+            height: 100%;
+        }
+
+        /* Colored borders */
+        .border-left-primary { border-left: 3pt solid #4e73df !important; }
+        .border-left-success { border-left: 3pt solid #1cc88a !important; }
+        .border-left-info { border-left: 3pt solid #36b9cc !important; }
+        .border-left-warning { border-left: 3pt solid #f6c23e !important; }
+        .border-left-secondary { border-left: 3pt solid #858796 !important; }
+
+        .row.mb-4:first-of-type .card-body {
+            padding: 6pt !important;
+        }
+
+        .row.mb-4:first-of-type .text-uppercase {
+            font-size: 6.5pt !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.3pt !important;
+            margin-bottom: 3pt !important;
+        }
+
+        .row.mb-4:first-of-type .h2 {
+            font-size: 16pt !important;
+            margin: 0 !important;
+            font-weight: 700 !important;
+        }
+
+        /* === CHARTS SECTION - Keep together, don't force page break === */
+        .row.mb-4:has(canvas) {
+            page-break-inside: avoid !important;
+            margin-bottom: 10pt !important;
+            margin-top: 10pt !important;
+        }
+
+        .row.mb-4:has(canvas) .col-md-6 {
+            page-break-inside: avoid !important;
+        }
+
+        .card.shadow {
+            page-break-inside: avoid !important;
+            box-shadow: 0 1pt 2pt rgba(0,0,0,0.1) !important;
+            border: 1px solid #dee2e6 !important;
+            border-radius: 3pt !important;
+            margin-bottom: 8pt !important;
+        }
+
+        .card-header {
+            font-weight: 700 !important;
+            font-size: 10pt !important;
+            padding: 5pt 8pt !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .card-body {
+            padding: 8pt !important;
+        }
+
+        /* Charts - smaller but visible */
+        canvas {
+            max-height: 180pt !important;
+            width: 100% !important;
+        }
+
+        /* === TABLE SECTION === */
+        .card:has(#assignmentsTable) {
+            page-break-before: always !important;
+            box-shadow: 0 1pt 2pt rgba(0,0,0,0.1) !important;
+            border: 1px solid #dee2e6 !important;
+        }
+
+        .card:has(#assignmentsTable) .card-header {
+            background-color: #ffc107 !important;
+            color: #000 !important;
+            padding: 6pt 8pt !important;
+        }
+
+        .card:has(#assignmentsTable) .card-body {
+            padding: 8pt !important;
+        }
+
+        /* Table styling */
+        .table-responsive {
+            overflow: visible !important;
+            width: 100% !important;
+        }
+
+        .table {
+            font-size: 7.5pt !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+            page-break-inside: auto !important;
+            margin: 0 !important;
+        }
+
+        .table thead {
+            display: table-header-group !important;
+            background-color: #343a40 !important;
+            color: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .table thead th {
+            font-size: 7.5pt !important;
+            font-weight: 700 !important;
+            padding: 4pt 3pt !important;
+            border: 1px solid #dee2e6 !important;
+            color: white !important;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .table tbody {
+            display: table-row-group !important;
+        }
+
+        .table tbody tr {
+            display: table-row !important;
+            page-break-inside: avoid !important;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #f8f9fa !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .table td {
+            display: table-cell !important;
+            padding: 3pt 3pt !important;
+            border: 1px solid #dee2e6 !important;
+            font-size: 7.5pt !important;
+            vertical-align: middle !important;
+        }
+
+        .table td strong {
+            font-weight: 700;
+        }
+
+        /* Ensure all rows visible */
+        #assignmentsTable tbody tr,
+        #assignmentsTable tbody tr td {
+            display: table-row !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        #assignmentsTable tbody tr td {
+            display: table-cell !important;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 2pt 4pt !important;
+            font-size: 6.5pt !important;
+            font-weight: 600 !important;
+            border-radius: 2pt !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            white-space: nowrap;
+        }
+
+        .badge.bg-success {
+            background-color: #1cc88a !important;
+            color: white !important;
+        }
+
+        .badge.bg-warning {
+            background-color: #f6c23e !important;
+            color: #333 !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: #858796 !important;
+            color: white !important;
+        }
+
+        /* Progress bars */
+        .progress {
+            height: 10pt !important;
+            width: 50pt !important;
+            border: 1px solid #dee2e6 !important;
+            background-color: #e9ecef !important;
+            border-radius: 2pt !important;
+            overflow: hidden;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .progress-bar {
+            font-size: 6pt !important;
+            line-height: 10pt !important;
+            font-weight: 600;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .progress-bar.bg-success {
+            background-color: #1cc88a !important;
+        }
+
+        .progress-bar.bg-warning {
+            background-color: #f6c23e !important;
+        }
+
+        .progress-bar.bg-secondary {
+            background-color: #858796 !important;
+        }
+
+        /* Color preservation */
+        .text-danger { color: #dc3545 !important; }
+        .text-warning { color: #ffc107 !important; }
+        .text-success { color: #28a745 !important; }
+        .text-primary { color: #4e73df !important; }
+        .text-info { color: #36b9cc !important; }
+
+        .bg-primary { background-color: #4e73df !important; }
+        .bg-success { background-color: #1cc88a !important; }
+        .bg-info { background-color: #36b9cc !important; }
+        .bg-warning { background-color: #ffc107 !important; }
+
+        /* Icons */
+        .fas, .fa {
+            font-size: 7pt !important;
+        }
+
+        /* Spacing adjustments */
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        [class*="col-"] {
+            padding-left: 2pt !important;
+            padding-right: 2pt !important;
+        }
+
+        /* Footer */
+        .container-fluid::after {
+            content: "Generated: " attr(data-print-date) " | Learning Management System";
+            display: block;
+            text-align: center;
+            font-size: 7pt;
+            color: #6c757d;
+            margin-top: 10pt;
+            padding-top: 5pt;
+            border-top: 1px solid #dee2e6;
+        }
+    }
+</style>

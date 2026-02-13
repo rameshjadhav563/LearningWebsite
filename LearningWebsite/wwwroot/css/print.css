@@ -1,0 +1,85 @@
+/* Print stylesheet used by pages to make PDF output consistent (A4 landscape, reduced gutters)
+   Mirrors print rules used in HR Index page but scoped globally for reuse */
+
+@page {
+  size: A4 landscape;
+  margin: 0.6cm 0.6cm 0.8cm 0.6cm;
+}
+
+@media print {
+  /* Hide interactive elements */
+  .btn, .modal, .alert-dismissible .btn-close,
+  nav, .navbar, header, footer,
+  .dataTables_filter, .dataTables_length,
+  .dataTables_info, .dataTables_paginate,
+  .dataTables_wrapper > .row:first-child,
+  .dataTables_wrapper > .row:last-child {
+    display: none !important;
+  }
+
+  html, body {
+    width: auto !important;
+    max-width: 100% !important;
+    background: white !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 9pt;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .container, .container-fluid {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0.3cm 6pt !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Small, centered header */
+  .display-4 { font-size: 20pt !important; text-align: center; }
+  .lead { font-size: 9pt !important; text-align: center; }
+
+  /* Tables: prevent overflow and center */
+  .table-responsive { overflow: visible !important; width: 100% !important; }
+  .table {
+    font-size: 7.5pt !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto !important;
+    margin: 0 auto !important;
+    table-layout: fixed !important;
+    word-break: break-word !important;
+    box-sizing: border-box !important;
+  }
+
+  .table thead { display: table-header-group !important; }
+  .table thead th {
+    white-space: normal !important;
+    padding: 4pt 3pt !important;
+    font-size: 7.5pt !important;
+  }
+
+  .table td { white-space: normal !important; padding: 3pt 3pt !important; }
+
+  /* Keep cards/charts together */
+  .card, .card.shadow { page-break-inside: avoid !important; }
+
+  /* Footer print note */
+  .container::after {
+    content: "Generated: " attr(data-print-date) " | Learning Management System";
+    display: block;
+    text-align: center;
+    font-size: 7pt;
+    color: #6c757d;
+    margin-top: 10pt;
+    padding-top: 5pt;
+    border-top: 1px solid #dee2e6;
+  }
+
+  /* Preserve badge and progress colors */
+  .badge, .progress, .progress-bar { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}

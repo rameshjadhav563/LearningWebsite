@@ -1,0 +1,303 @@
+@using LearningWebsite.Models
+
+@{
+    ViewData["Title"] = "Manager Dashboard";
+    var manager = ViewBag.Manager as ApplicationUser;
+    var teamMembers = ViewBag.TeamMembers as List<ApplicationUser> ?? new List<ApplicationUser>();
+    var teamMemberCount = ViewBag.TeamMemberCount as int? ?? 0;
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-4">Manager Dashboard</h1>
+            <p class="text-muted lead">Welcome, <strong>@User.Identity?.Name</strong></p>
+        </div>
+    </div>
+
+    <!-- Manager Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-left-primary">
+                <div class="card-body">
+                    <div class="text-primary font-weight-bold text-uppercase mb-1">Team Members</div>
+                    <div class="h3 mb-0">@teamMemberCount</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-success">
+                <div class="card-body">
+                    <div class="text-success font-weight-bold text-uppercase mb-1">Admin Rights</div>
+                    <div class="h3 mb-0">✓ Active</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-info">
+                <div class="card-body">
+                    <div class="text-info font-weight-bold text-uppercase mb-1">Role</div>
+                    <div class="h3 mb-0">Manager</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-left-warning">
+                <div class="card-body">
+                    <div class="text-warning font-weight-bold text-uppercase mb-1">Permissions</div>
+                    <div class="h3 mb-0">Full</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Members Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-primary text-white">
+            <h6 class="m-0 font-weight-bold">Your Team Members</h6>
+        </div>
+        <div class="card-body">
+            @if (teamMembers.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var member in teamMembers)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@member.UserName</strong>
+                                    </td>
+                                    <td>@(member.FullName ?? "-")</td>
+                                    <td>@(member.Email ?? "-")</td>
+                                    <td>
+                                        <span class="badge bg-primary">@member.Role</span>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-info" 
+                                           asp-action="TeamMemberDetail" 
+                                           asp-route-id="@member.Id"
+                                           title="View learning assignments">
+                                            <i class="fas fa-eye"></i> View Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> No team members assigned to you yet.
+                </div>
+            }
+        </div>
+    </div>
+
+    </div>
+
+<style>
+    .card.border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .card.border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .card.border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .card.border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .text-primary { color: #4e73df; }
+    .text-success { color: #1cc88a; }
+    .text-info { color: #36b9cc; }
+    .text-warning { color: #f6c23e; }
+    .font-weight-bold { font-weight: 700; }
+</style>
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <table class="table table-hover" id="assignmentsTable" style="display:none;">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Employee</th>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Assigned Date</th>
+                                <th>Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assignmentsBody">
+                        </tbody>
+                    </table>
+                    <div id="noAssignmentsMessage" class="alert alert-info" style="display:none;">
+                        No assignments found.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            loadManagerDashboard();
+        });
+
+        function loadManagerDashboard() {
+            fetch('/api/dashboard/manager')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load dashboard');
+                    return response.json();
+                })
+                .then(data => {
+                    displayManagerStats(data);
+                    displayTeamMembers(data.teamAssignments);
+                    displayAllAssignments(data.teamAssignments);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('teamLoadingSpinner').innerHTML = '<div class="alert alert-danger">Failed to load dashboard data</div>';
+                });
+        }
+
+        function displayManagerStats(data) {
+            document.getElementById('teamMembers').textContent = data.totalTeamMembers;
+            document.getElementById('totalAssignments').textContent = data.totalAssignments;
+            document.getElementById('completedCount').textContent = data.completedAssignments;
+            document.getElementById('inProgressCount').textContent = data.inProgressAssignments;
+            document.getElementById('notStartedCount').textContent = data.notStartedAssignments;
+            document.getElementById('completionRate').textContent = data.completionRate + '%';
+        }
+
+        function displayTeamMembers(teamAssignments) {
+            const container = document.getElementById('teamMembersRow');
+            const spinner = document.getElementById('teamLoadingSpinner');
+            const teamContainer = document.getElementById('teamContainer');
+
+            container.innerHTML = '';
+
+            if (teamAssignments.length === 0) {
+                spinner.innerHTML = '<div class="alert alert-info">No team members found</div>';
+                return;
+            }
+
+            teamAssignments.forEach(member => {
+                const completionRate = member.totalAssigned > 0 
+                    ? Math.round((member.completed / member.totalAssigned) * 100)
+                    : 0;
+
+                const memberCard = document.createElement('div');
+                memberCard.className = 'col-md-6 col-lg-4 mb-3';
+                memberCard.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">${member.userName}</h5>
+                            <div class="mb-3">
+                                <small class="text-muted">Completion Progress</small>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: ${completionRate}%">
+                                        ${completionRate}%
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row text-center">
+                                <div class="col">
+                                    <strong>${member.totalAssigned}</strong>
+                                    <small class="d-block text-muted">Total</small>
+                                </div>
+                                <div class="col">
+                                    <strong class="text-success">${member.completed}</strong>
+                                    <small class="d-block text-muted">Completed</small>
+                                </div>
+                                <div class="col">
+                                    <strong class="text-warning">${member.inProgress}</strong>
+                                    <small class="d-block text-muted">In Progress</small>
+                                </div>
+                                <div class="col">
+                                    <strong class="text-danger">${member.notStarted}</strong>
+                                    <small class="d-block text-muted">Not Started</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(memberCard);
+            });
+
+            spinner.style.display = 'none';
+            teamContainer.style.display = 'block';
+        }
+
+        function displayAllAssignments(teamAssignments) {
+            const tbody = document.getElementById('assignmentsBody');
+            const table = document.getElementById('assignmentsTable');
+            const noDataMsg = document.getElementById('noAssignmentsMessage');
+            const spinner = document.getElementById('assignmentsLoadingSpinner');
+
+            tbody.innerHTML = '';
+            let allAssignments = [];
+
+            teamAssignments.forEach(member => {
+                member.assignments.forEach(assignment => {
+                    allAssignments.push({
+                        ...assignment,
+                        userName: member.userName
+                    });
+                });
+            });
+
+            if (allAssignments.length === 0) {
+                table.style.display = 'none';
+                noDataMsg.style.display = 'block';
+                spinner.style.display = 'none';
+            } else {
+                allAssignments.forEach(assignment => {
+                    const row = document.createElement('tr');
+                    const statusBadge = getStatusBadge(assignment.status);
+                    const progressBar = `<div class="progress" style="height: 20px;">
+                        <div class="progress-bar" role="progressbar" style="width: ${assignment.progressPercentage || 0}%">
+                            ${assignment.progressPercentage || 0}%
+                        </div>
+                    </div>`;
+
+                    row.innerHTML = `
+                        <td><strong>${assignment.userName}</strong></td>
+                        <td>${assignment.title}</td>
+                        <td>${statusBadge}</td>
+                        <td>${progressBar}</td>
+                        <td>${new Date(assignment.assignedDate).toLocaleDateString()}</td>
+                        <td>${new Date(assignment.dueDate).toLocaleDateString()}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                table.style.display = 'table';
+                noDataMsg.style.display = 'none';
+                spinner.style.display = 'none';
+            }
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'Completed': '<span class="badge bg-success">Completed</span>',
+                'InProgress': '<span class="badge bg-warning">In Progress</span>',
+                'NotStarted': '<span class="badge bg-secondary">Not Started</span>'
+            };
+            return badges[status] || status;
+        }
+    </script>
+}

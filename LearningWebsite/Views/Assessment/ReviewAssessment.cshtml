@@ -1,0 +1,176 @@
+@model LearningWebsite.Models.AssessmentResultViewModel
+@{
+    ViewData["Title"] = "Assessment Review";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/assessment-review.css" asp-append-version="true" />
+}
+
+<div class="review-container">
+    <!-- Header -->
+    <div class="review-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="review-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        <div>
+                            <h1>@Model.LearningTitle</h1>
+                            <p class="mb-0">Assessment Review</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="review-date">
+                        <i class="fas fa-calendar"></i>
+                        <span>@Model.CompletedDate.ToString("MMM dd, yyyy hh:mm tt")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <!-- Score Summary Card -->
+        <div class="summary-card @(Model.Passed ? "summary-passed" : "summary-failed")">
+            <div class="summary-icon">
+                <i class="fas @(Model.Passed ? "fa-trophy" : "fa-exclamation-triangle")"></i>
+            </div>
+            <div class="summary-content">
+                <div class="summary-title">
+                    @if (Model.Passed)
+                    {
+                        <h3><i class="fas fa-check-circle"></i> Congratulations! You Passed</h3>
+                    }
+                    else
+                    {
+                        <h3><i class="fas fa-times-circle"></i> Not Passed - Keep Learning!</h3>
+                    }
+                </div>
+                <div class="summary-stats">
+                    <div class="stat-box">
+                        <div class="stat-label">Score</div>
+                        <div class="stat-value">@Model.Score.ToString("F1")%</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Correct Answers</div>
+                        <div class="stat-value">@Model.CorrectAnswers / @Model.TotalQuestions</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value">@(Model.Passed ? "PASSED" : "FAILED")</div>
+                    </div>
+                </div>
+
+                @if (Model.Passed && ViewBag.HasCertificate == true)
+                {
+                    <div class="certificate-section">
+                        <div class="certificate-icon">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div class="certificate-content">
+                            <h5>🎉 Certificate Earned!</h5>
+                            <p class="mb-3">Congratulations! You've earned a certificate for completing this assessment.</p>
+                            <a asp-controller="Certificates" asp-action="View" asp-route-id="@ViewBag.CertificateId" 
+                               class="btn btn-certificate btn-lg">
+                                <i class="fas fa-certificate"></i> View Certificate
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Questions Review -->
+        <div class="questions-section">
+            <div class="section-header">
+                <h4><i class="fas fa-list-alt"></i> Question-by-Question Review</h4>
+                <p>Review your answers and learn from the correct solutions</p>
+            </div>
+
+            @if (Model.QuestionResults != null && Model.QuestionResults.Any())
+            {
+                @for (int i = 0; i < Model.QuestionResults.Count; i++)
+                {
+                    var questionResult = Model.QuestionResults[i];
+                    <div class="question-review-card @(questionResult.IsCorrect ? "correct-answer" : "wrong-answer")">
+                        <div class="question-number">
+                            <span class="number-badge @(questionResult.IsCorrect ? "badge-correct" : "badge-wrong")">
+                                Question @(i + 1)
+                            </span>
+                            <span class="result-icon">
+                                @if (questionResult.IsCorrect)
+                                {
+                                    <i class="fas fa-check-circle text-success"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-times-circle text-danger"></i>
+                                }
+                            </span>
+                        </div>
+
+                        <div class="question-content">
+                            <h5 class="question-text">@questionResult.QuestionText</h5>
+
+                            <div class="answer-comparison">
+                                <div class="answer-box your-answer @(questionResult.IsCorrect ? "answer-correct" : "answer-incorrect")">
+                                    <div class="answer-label">
+                                        <i class="fas fa-user"></i> Your Answer
+                                        @if (questionResult.IsCorrect)
+                                        {
+                                            <span class="ms-2"><i class="fas fa-check-circle"></i> Correct</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="ms-2"><i class="fas fa-times-circle"></i> Incorrect</span>
+                                        }
+                                    </div>
+                                    <div class="answer-text">
+                                        @questionResult.YourAnswer
+                                    </div>
+                                </div>
+
+                                <div class="answer-box correct-answer-box">
+                                    <div class="answer-label">
+                                        <i class="fas fa-check"></i> Correct Answer
+                                    </div>
+                                    <div class="answer-text">
+                                        @questionResult.CorrectAnswer
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-details-card">
+                    <div class="no-details-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="no-details-content">
+                        <h5>Detailed Review Not Available</h5>
+                        <p>This assessment was completed before the detailed tracking feature was enabled.</p>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-lightbulb"></i> 
+                            Complete a new assessment to see question-by-question breakdown with answers!
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a asp-action="AssessmentHistory" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-arrow-left"></i> Back to History
+            </a>
+            <a asp-controller="Employee" asp-action="Index" class="btn btn-primary btn-lg">
+                <i class="fas fa-home"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,319 @@
+@using LearningWebsite.Models
+
+@{
+    ViewData["Title"] = "Team Member Details";
+    var teamMember = ViewBag.TeamMember as ApplicationUser;
+    var assignments = ViewBag.Assignments as List<LearningAssignment> ?? new List<LearningAssignment>();
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1>Team Member Details</h1>
+            <p class="text-muted">@(teamMember?.FullName ?? teamMember?.UserName)</p>
+            <a class="btn btn-secondary" asp-action="Index">
+                <i class="fas fa-arrow-left"></i> Back to Team
+            </a>
+        </div>
+    </div>
+
+    <!-- Member Info Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-primary text-white">
+            <h6 class="m-0 font-weight-bold">Employee Information</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <strong>Username:</strong>
+                    <p>@teamMember?.UserName</p>
+                </div>
+                <div class="col-md-3">
+                    <strong>Full Name:</strong>
+                    <p>@(teamMember?.FullName ?? "-")</p>
+                </div>
+                <div class="col-md-3">
+                    <strong>Email:</strong>
+                    <p>@(teamMember?.Email ?? "-")</p>
+                </div>
+                <div class="col-md-3">
+                    <strong>Role:</strong>
+                    <p><span class="badge bg-primary">@teamMember?.Role</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Assignments -->
+    <div class="card shadow">
+        <div class="card-header py-3 bg-success text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold">Learning Assignments</h6>
+                <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#assignLearningModal">
+                    <i class="fas fa-plus"></i> Assign Learning
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (assignments.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Learning Title</th>
+                                <th>Category</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Assigned Date</th>
+                                <th>Due Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var assignment in assignments.OrderBy(a => a.DueDate))
+                            {
+                                <tr>
+                                    <td><strong>@assignment.Learning?.Title</strong></td>
+                                    <td>@assignment.Learning?.Category</td>
+                                    <td>@(assignment.Learning?.DurationInHours) hrs</td>
+                                    <td>
+                                        @if (assignment.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success"><i class="fas fa-check"></i> @assignment.Status</span>
+                                        }
+                                        else if (assignment.Status == "InProgress")
+                                        {
+                                            <span class="badge bg-warning text-dark"><i class="fas fa-spinner"></i> @assignment.Status</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary"><i class="fas fa-circle"></i> @assignment.Status</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar @GetProgressBarColor(assignment.Status)" role="progressbar" 
+                                                 style="width: @(assignment.ProgressPercentage ?? 0)%;" 
+                                                 aria-valuenow="@(assignment.ProgressPercentage ?? 0)" aria-valuemin="0" aria-valuemax="100">
+                                                @(assignment.ProgressPercentage ?? 0)%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@assignment.AssignedDate.ToString("MMM dd, yyyy")</td>
+                                    <td>@assignment.DueDate.ToString("MMM dd, yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> No learning assignments yet. 
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#assignLearningModal">
+                        Assign one now
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Assign Learning Modal -->
+<div class="modal fade" id="assignLearningModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" asp-action="AssignMultipleLearnings">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign Learnings to @teamMember?.UserName</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="memberId" value="@teamMember?.Id" />
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Hold <kbd>Ctrl</kbd> (Windows) or <kbd>Cmd</kbd> (Mac) to select multiple learnings
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="learningIds" class="form-label">Select Learnings <span class="text-danger">*</span></label>
+                        <select class="form-select" id="learningIds" name="learningIds" multiple size="8" required style="height: 300px;">
+                            <!-- Options loaded via JavaScript -->
+                        </select>
+                        <small class="form-text text-muted">
+                            <strong>Selected:</strong> <span id="selectedCount">0</span> learning(s)
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dueDate" class="form-label">Due Date</label>
+                        <input type="date" class="form-control" id="dueDate" name="dueDate" 
+                               value="@DateTime.Now.AddDays(30).ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <!-- Quick Select Buttons -->
+                    <div class="mb-3">
+                        <label class="form-label">Quick Select:</label>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllBtn">
+                                <i class="fas fa-check-double"></i> Select All
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="clearAllBtn">
+                                <i class="fas fa-times"></i> Clear All
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-info" id="selectTechnicalBtn">
+                                <i class="fas fa-code"></i> Technical Only
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-success" id="selectSoftSkillsBtn">
+                                <i class="fas fa-users"></i> Soft Skills Only
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Learnings Preview -->
+                    <div id="selectedPreview" class="mb-3" style="display: none;">
+                        <label class="form-label">Selected Learnings:</label>
+                        <div id="selectedList" class="border rounded p-2 bg-light">
+                            <!-- Selected items will appear here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="assignBtn" disabled>
+                        <i class="fas fa-plus-circle"></i> Assign Selected Learnings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let allLearnings = [];
+
+        $(document).ready(function() {
+            // Show notification messages from TempData
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                showSuccess('@Html.Raw(TempData["SuccessMessage"])');
+                </text>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                showError('@Html.Raw(TempData["ErrorMessage"])');
+                </text>
+            }
+
+            @if (TempData["InfoMessage"] != null)
+            {
+                <text>
+                showInfo('@Html.Raw(TempData["InfoMessage"])');
+                </text>
+            }
+
+            // Load available learnings
+            $.get('/api/learnings', function(data) {
+                allLearnings = data;
+                var select = $('#learningIds');
+                select.empty();
+
+                $.each(data, function(index, learning) {
+                    const option = $('<option></option>')
+                        .attr('value', learning.id)
+                        .attr('data-category', learning.category)
+                        .text(learning.title + ' (' + learning.category + ')');
+                    select.append(option);
+                });
+
+                updateSelectedCount();
+            });
+
+            // Update count and enable/disable button on selection change
+            $('#learningIds').on('change', function() {
+                updateSelectedCount();
+                updateSelectedPreview();
+            });
+
+            // Select All button
+            $('#selectAllBtn').on('click', function() {
+                $('#learningIds option').prop('selected', true);
+                updateSelectedCount();
+                updateSelectedPreview();
+            });
+
+            // Clear All button
+            $('#clearAllBtn').on('click', function() {
+                $('#learningIds option').prop('selected', false);
+                updateSelectedCount();
+                updateSelectedPreview();
+            });
+
+            // Select Technical Only
+            $('#selectTechnicalBtn').on('click', function() {
+                $('#learningIds option').prop('selected', false);
+                $('#learningIds option[data-category="Technical"]').prop('selected', true);
+                updateSelectedCount();
+                updateSelectedPreview();
+            });
+
+            // Select Soft Skills Only
+            $('#selectSoftSkillsBtn').on('click', function() {
+                $('#learningIds option').prop('selected', false);
+                $('#learningIds option[data-category="Soft Skills"]').prop('selected', true);
+                updateSelectedCount();
+                updateSelectedPreview();
+            });
+        });
+
+        function updateSelectedCount() {
+            const selected = $('#learningIds option:selected').length;
+            $('#selectedCount').text(selected);
+            $('#assignBtn').prop('disabled', selected === 0);
+        }
+
+        function updateSelectedPreview() {
+            const selected = $('#learningIds option:selected');
+            const preview = $('#selectedPreview');
+            const list = $('#selectedList');
+
+            if (selected.length > 0) {
+                preview.show();
+                list.empty();
+
+                selected.each(function() {
+                    const badge = $('<span></span>')
+                        .addClass('badge bg-primary me-1 mb-1')
+                        .text($(this).text());
+                    list.append(badge);
+                });
+            } else {
+                preview.hide();
+            }
+        }
+    </script>
+}
+
+@functions {
+    private string GetProgressBarColor(string status)
+    {
+        return status switch
+        {
+            "Completed" => "bg-success",
+            "InProgress" => "bg-warning",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+<style>
+    .font-weight-bold {
+        font-weight: 700;
+    }
+</style>

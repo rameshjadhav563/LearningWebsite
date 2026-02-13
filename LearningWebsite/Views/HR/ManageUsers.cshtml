@@ -1,0 +1,204 @@
+@model List<LearningWebsite.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Manage Users";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Manage All Users</h1>
+            <p class="text-muted">Full CRUD access to user management</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a class="btn btn-success btn-lg" asp-action="CreateUser">
+                <i class="fas fa-user-plus"></i> Create New User
+            </a>
+            <a class="btn btn-secondary" asp-action="Index">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Filters -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by username, name, or email...">
+                </div>
+                <div class="col-md-3">
+                    <select id="roleFilter" class="form-select">
+                        <option value="">All Roles</option>
+                        <option value="Employee">Employee</option>
+                        <option value="Manager">Manager</option>
+                        <option value="HR">HR Admin</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge bg-primary p-2">Total: @Model.Count users</span>
+                    <span class="badge bg-success p-2">Employees: @Model.Count(u => u.Role == "Employee")</span>
+                    <span class="badge bg-info p-2">Managers: @Model.Count(u => u.Role == "Manager")</span>
+                    <span class="badge bg-danger p-2">HR: @Model.Count(u => u.Role == "HR")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card shadow">
+        <div class="card-header py-3 bg-primary text-white">
+            <h6 class="m-0 font-weight-bold">All Users (@Model.Count)</h6>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover" id="usersTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Manager</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model)
+                            {
+                                <tr class="user-row" data-role="@user.Role">
+                                    <td>@user.Id</td>
+                                    <td><strong>@user.UserName</strong></td>
+                                    <td>@(user.FullName ?? "-")</td>
+                                    <td>@(user.Email ?? "-")</td>
+                                    <td>
+                                        @if (user.Role == "Employee")
+                                        {
+                                            <span class="badge bg-primary">Employee</span>
+                                        }
+                                        else if (user.Role == "Manager")
+                                        {
+                                            <span class="badge bg-success">Manager</span>
+                                        }
+                                        else if (user.Role == "HR")
+                                        {
+                                            <span class="badge bg-danger">HR Admin</span>
+                                        }
+                                    </td>
+                                    <td>@(user.Manager?.UserName ?? "-")</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a class="btn btn-sm btn-info" asp-action="UserDetails" asp-route-id="@user.Id" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a class="btn btn-sm btn-warning" asp-action="EditUser" asp-route-id="@user.Id" title="Edit User">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a class="btn btn-sm btn-danger" asp-action="DeleteUser" asp-route-id="@user.Id" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+
+                                        <!-- Quick Role Change -->
+                                        <div class="btn-group ms-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                Role
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <form method="post" asp-action="AssignRole" style="display:inline;">
+                                                        <input type="hidden" name="userId" value="@user.Id" />
+                                                        <input type="hidden" name="role" value="Employee" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fas fa-user"></i> Set as Employee
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form method="post" asp-action="AssignRole" style="display:inline;">
+                                                        <input type="hidden" name="userId" value="@user.Id" />
+                                                        <input type="hidden" name="role" value="Manager" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fas fa-users"></i> Set as Manager
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <form method="post" asp-action="AssignRole" style="display:inline;">
+                                                        <input type="hidden" name="userId" value="@user.Id" />
+                                                        <input type="hidden" name="role" value="HR" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fas fa-user-shield"></i> Set as HR
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">No users found in the system.</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#usersTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchValue) ? '' : 'none';
+            });
+        });
+
+        // Role filter
+        document.getElementById('roleFilter').addEventListener('change', function() {
+            const roleValue = this.value;
+            const rows = document.querySelectorAll('.user-row');
+            
+            rows.forEach(row => {
+                if (roleValue === '' || row.dataset.role === roleValue) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Confirm role change
+        document.querySelectorAll('form[action*="AssignRole"]').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const role = this.querySelector('input[name="role"]').value;
+                if (!confirm(`Are you sure you want to change this user's role to ${role}?`)) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .font-weight-bold { font-weight: 700; }
+</style>

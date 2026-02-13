@@ -1,0 +1,331 @@
+@{
+    ViewData["Title"] = "Employee Dashboard";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/employee-dashboard.css" asp-append-version="true" />
+}
+
+<div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="dashboard-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        My Learning Dashboard
+                    </h1>
+                    <p class="dashboard-subtitle">Welcome back, <strong>@User.Identity?.Name</strong></p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a asp-controller="Certificates" asp-action="Index" class="btn btn-outline-light me-2">
+                        <i class="fas fa-certificate"></i> My Certificates
+                    </a>
+                    <a asp-action="AssessmentHistory" asp-controller="Assessment" class="btn btn-outline-light">
+                        <i class="fas fa-history"></i> Assessment History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-4">
+        <!-- Dashboard Stats -->
+        <div class="row mb-4 g-3">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card stat-total">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalAssignments">0</div>
+                        <div class="stat-label">Total Assigned</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card stat-completed">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="completedCount">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card stat-progress">
+                    <div class="stat-icon">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="inProgressCount">0</div>
+                        <div class="stat-label">In Progress</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card stat-notstarted">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="notStartedCount">0</div>
+                        <div class="stat-label">Not Started</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignments Table -->
+        <div class="assignments-card">
+            <div class="assignments-header">
+                <h5><i class="fas fa-list"></i> My Learning Assignments</h5>
+            </div>
+            <div class="assignments-body">
+                <div id="loadingSpinner" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading your assignments...</p>
+                </div>
+                <div class="table-responsive" id="assignmentsTable" style="display:none;">
+                    <table class="assignments-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Progress</th>
+                                <th>Assigned Date</th>
+                                <th>Due Date</th>
+                                <th>Days Left</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assignmentsBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="noDataMessage" class="empty-state" style="display:none;">
+                    <i class="fas fa-inbox"></i>
+                    <h5>No Learning Assignments</h5>
+                    <p>You don't have any learning assignments at this time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Progress Modal -->
+<div class="modal fade" id="updateProgressModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit"></i> Update Learning Progress
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="assignmentTitle" class="form-label">Assignment</label>
+                    <input type="text" class="form-control" id="assignmentTitle" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="statusSelect" class="form-label">Status</label>
+                    <select class="form-control" id="statusSelect">
+                        <option value="NotStarted">Not Started</option>
+                        <option value="InProgress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="progressSlider" class="form-label">
+                        Progress: <strong id="progressValue">0</strong>%
+                    </label>
+                    <input type="range" class="form-range" id="progressSlider" min="0" max="100" value="0">
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">0%</small>
+                        <small class="text-muted">50%</small>
+                        <small class="text-muted">100%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="saveProgressBtn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentAssignmentId = null;
+        const modal = new bootstrap.Modal(document.getElementById('updateProgressModal'));
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDashboard();
+            document.getElementById('progressSlider').addEventListener('input', function () {
+                document.getElementById('progressValue').textContent = this.value;
+            });
+            document.getElementById('saveProgressBtn').addEventListener('click', saveProgress);
+        });
+
+        function loadDashboard() {
+            fetch('/api/dashboard/employee')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to load dashboard');
+                    return response.json();
+                })
+                .then(data => {
+                    displayDashboardStats(data);
+                    displayAssignments(data.assignments);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('loadingSpinner').innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Failed to load dashboard data</div>';
+                });
+        }
+
+        function displayDashboardStats(data) {
+            document.getElementById('totalAssignments').textContent = data.totalAssignments;
+            document.getElementById('completedCount').textContent = data.completed;
+            document.getElementById('inProgressCount').textContent = data.inProgress;
+            document.getElementById('notStartedCount').textContent = data.notStarted;
+        }
+
+        function displayAssignments(assignments) {
+            const tbody = document.getElementById('assignmentsBody');
+            const table = document.getElementById('assignmentsTable');
+            const noDataMsg = document.getElementById('noDataMessage');
+            const spinner = document.getElementById('loadingSpinner');
+
+            tbody.innerHTML = '';
+
+            if (assignments.length === 0) {
+                table.style.display = 'none';
+                noDataMsg.style.display = 'block';
+                spinner.style.display = 'none';
+            } else {
+                assignments.forEach(assignment => {
+                    const row = document.createElement('tr');
+                    const statusBadge = getStatusBadge(assignment.status);
+                    const progressBar = getProgressBar(assignment.progressPercentage || 0);
+                    const daysLeftBadge = getDaysLeftBadge(assignment.daysUntilDue);
+
+                    row.innerHTML = `
+                        <td>
+                            <div class="assignment-title">
+                                <i class="fas fa-book text-primary"></i>
+                                <strong>${assignment.title}</strong>
+                            </div>
+                        </td>
+                        <td><span class="category-badge">${assignment.category}</span></td>
+                        <td>${statusBadge}</td>
+                        <td>${progressBar}</td>
+                        <td>${new Date(assignment.assignedDate).toLocaleDateString()}</td>
+                        <td>${new Date(assignment.dueDate).toLocaleDateString()}</td>
+                        <td>${daysLeftBadge}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="/Assessment/Training/${assignment.learningId}" class="btn-action btn-training" title="Start Training">
+                                    <i class="fas fa-play-circle"></i> Training
+                                </a>
+                                <button class="btn-action btn-update" 
+                                        onclick="openUpdateModal(${assignment.id}, '${assignment.title}', '${assignment.status}', ${assignment.progressPercentage || 0})"
+                                        title="Update Progress">
+                                    <i class="fas fa-edit"></i> Update
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                table.style.display = 'block';
+                noDataMsg.style.display = 'none';
+                spinner.style.display = 'none';
+            }
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'Completed': '<span class="status-badge status-completed"><i class="fas fa-check-circle"></i> Completed</span>',
+                'InProgress': '<span class="status-badge status-inprogress"><i class="fas fa-spinner"></i> In Progress</span>',
+                'NotStarted': '<span class="status-badge status-notstarted"><i class="fas fa-clock"></i> Not Started</span>',
+                'Not Started': '<span class="status-badge status-notstarted"><i class="fas fa-clock"></i> Not Started</span>',
+                'In Progress': '<span class="status-badge status-inprogress"><i class="fas fa-spinner"></i> In Progress</span>'
+            };
+            return badges[status] || `<span class="status-badge status-notstarted">${status}</span>`;
+        }
+
+        function getProgressBar(progress) {
+            const percentage = progress || 0;
+            let colorClass = 'bg-danger';
+            if (percentage >= 70) colorClass = 'bg-success';
+            else if (percentage >= 40) colorClass = 'bg-warning';
+
+            return `
+                <div class="modern-progress">
+                    <div class="modern-progress-bar ${colorClass}" style="width: ${percentage}%">
+                        <span>${percentage}%</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getDaysLeftBadge(days) {
+            if (days < 0) {
+                return `<span class="days-badge days-overdue"><i class="fas fa-exclamation-triangle"></i> Overdue</span>`;
+            } else if (days === 0) {
+                return `<span class="days-badge days-today"><i class="fas fa-bell"></i> Due Today</span>`;
+            } else if (days <= 7) {
+                return `<span class="days-badge days-urgent"><i class="fas fa-clock"></i> ${days} days</span>`;
+            } else {
+                return `<span class="days-badge days-normal"><i class="fas fa-calendar"></i> ${days} days</span>`;
+            }
+        }
+
+        function openUpdateModal(assignmentId, title, status, progress) {
+            currentAssignmentId = assignmentId;
+            document.getElementById('assignmentTitle').value = title;
+            document.getElementById('statusSelect').value = status;
+            document.getElementById('progressSlider').value = progress;
+            document.getElementById('progressValue').textContent = progress;
+            modal.show();
+        }
+
+        function saveProgress() {
+            const status = document.getElementById('statusSelect').value;
+            const progress = parseInt(document.getElementById('progressSlider').value);
+
+            fetch(`/api/assignments/${currentAssignmentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                },
+                body: JSON.stringify({
+                    status: status,
+                    progressPercentage: progress
+                })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to update assignment');
+                    modal.hide();
+                    loadDashboard();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update assignment');
+                });
+        }
+    </script>
+}

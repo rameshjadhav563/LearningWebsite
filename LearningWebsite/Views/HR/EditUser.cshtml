@@ -1,0 +1,112 @@
+@model LearningWebsite.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Edit User";
+    var managers = ViewBag.Managers as List<LearningWebsite.Models.ApplicationUser> ?? new List<LearningWebsite.Models.ApplicationUser>();
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Edit User: @Model.UserName</h1>
+            <p class="text-muted">Modify user details, role, and password</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a class="btn btn-secondary" asp-action="ManageUsers">
+                <i class="fas fa-arrow-left"></i> Back to Users
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card shadow">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0"><i class="fas fa-edit"></i> User Information</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" asp-action="EditUser">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="UserName" class="form-label">Username <span class="text-danger">*</span></label>
+                        <input asp-for="UserName" class="form-control" required />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="newPassword" class="form-label">New Password (leave blank to keep current)</label>
+                        <input type="password" id="newPassword" name="newPassword" class="form-control" minlength="6" />
+                        <small class="form-text text-muted">Only fill if you want to change the password</small>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label">Full Name</label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" type="email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Role" class="form-label">Role <span class="text-danger">*</span></label>
+                        <select asp-for="Role" class="form-select" required>
+                            <option value="Employee">Employee</option>
+                            <option value="Manager">Manager</option>
+                            <option value="HR">HR Admin</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ManagerId" class="form-label">Assign Manager</label>
+                        <select asp-for="ManagerId" class="form-select">
+                            <option value="">-- No Manager --</option>
+                            @foreach (var manager in managers)
+                            {
+                                <option value="@manager.Id">@manager.UserName (@manager.FullName)</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ManagerId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-warning btn-lg">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <a class="btn btn-secondary btn-lg" asp-action="ManageUsers">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <a class="btn btn-info btn-lg" asp-action="UserDetails" asp-route-id="@Model.Id">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        <a class="btn btn-danger btn-lg float-end" asp-action="DeleteUser" asp-route-id="@Model.Id">
+                            <i class="fas fa-trash"></i> Delete User
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,201 @@
+@model List<LearningWebsite.Models.Certificate>
+@{
+    ViewData["Title"] = "My Certificates";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/certificates.css" asp-append-version="true" />
+}
+
+<div class="certificates-container">
+    <!-- Header -->
+    <div class="certificates-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="certificates-title">
+                        <i class="fas fa-certificate"></i>
+                        My Certificates
+                    </h1>
+                    <p class="certificates-subtitle">Your learning achievements and certifications</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="certificate-count">
+                        <i class="fas fa-award"></i>
+                        <strong>@Model.Count</strong> Certificate@(Model.Count != 1 ? "s" : "") Earned
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-4">
+        @if (Model.Any())
+        {
+            <div class="row g-4">
+                @foreach (var certificate in Model)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="certificate-card">
+                            <div class="certificate-badge">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div class="certificate-content">
+                                <h3 class="certificate-learning-title">@certificate.LearningTitle</h3>
+                                <div class="certificate-score">
+                                    <div class="score-circle">
+                                        <span class="score-value">@certificate.Score.ToString("F0")%</span>
+                                    </div>
+                                </div>
+                                <div class="certificate-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-hashtag"></i>
+                                        <span>@certificate.CertificateNumber</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>@certificate.IssuedDate.ToString("MMMM dd, yyyy")</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-user"></i>
+                                        <span>@certificate.EmployeeName</span>
+                                    </div>
+                                </div>
+                                <div class="certificate-actions">
+                                    <a asp-action="View" asp-route-id="@certificate.Id" class="btn-view-certificate">
+                                        <i class="fas fa-eye"></i> View Certificate
+                                    </a>
+                                    <button onclick="quickShare('@certificate.LearningTitle', '@certificate.Score.ToString("F0")', '@certificate.CertificateNumber')" class="btn-share-quick">
+                                        <i class="fas fa-share-alt"></i> Share
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="certificate-footer">
+                                <span class="certificate-category">@certificate.Learning?.Category</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-certificates">
+                <div class="empty-icon">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <h3>No Certificates Yet</h3>
+                <p>Complete assessments with 70% or higher to earn certificates!</p>
+                <a asp-controller="Employee" asp-action="Index" class="btn btn-primary btn-lg">
+                    <i class="fas fa-graduation-cap"></i> Start Learning
+                </a>
+            </div>
+        }
+
+        <!-- Back Button -->
+        <div class="action-section">
+            <a asp-controller="Employee" asp-action="Index" class="btn btn-secondary btn-lg">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Share Modal -->
+<div class="modal fade" id="quickShareModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-share-alt"></i> Share Certificate
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="share-options">
+                    <button onclick="shareQuickLinkedIn()" class="share-option-btn linkedin-btn">
+                        <i class="fab fa-linkedin fa-2x"></i>
+                        <span>LinkedIn</span>
+                    </button>
+                    <button onclick="shareQuickTwitter()" class="share-option-btn twitter-btn">
+                        <i class="fab fa-twitter fa-2x"></i>
+                        <span>Twitter</span>
+                    </button>
+                    <button onclick="shareQuickEmail()" class="share-option-btn email-btn">
+                        <i class="fas fa-envelope fa-2x"></i>
+                        <span>Email</span>
+                    </button>
+                    <button onclick="copyQuickNumber()" class="share-option-btn copy-btn">
+                        <i class="fas fa-hashtag fa-2x"></i>
+                        <span>Copy Number</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Toast -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="shareToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong class="me-auto">Success!</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toastMessage">
+            Shared successfully!
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentShareData = {};
+        const shareModal = new bootstrap.Modal(document.getElementById('quickShareModal'));
+
+        function quickShare(title, score, certNumber) {
+            currentShareData = {
+                title: title,
+                score: score,
+                certNumber: certNumber
+            };
+            shareModal.show();
+        }
+
+        function shareQuickLinkedIn() {
+            const text = `I'm proud to share that I've earned a certificate in ${currentShareData.title} with a score of ${currentShareData.score}%! 🎓`;
+            const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.origin)}`;
+            window.open(url, '_blank', 'width=600,height=600');
+            shareModal.hide();
+        }
+
+        function shareQuickTwitter() {
+            const text = `I just earned a certificate in ${currentShareData.title} with ${currentShareData.score}%! 🎓 #Certificate #Learning`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank', 'width=600,height=400');
+            shareModal.hide();
+        }
+
+        function shareQuickEmail() {
+            const subject = `Certificate Achievement: ${currentShareData.title}`;
+            const body = `I'm excited to share that I've earned a certificate in ${currentShareData.title} with a score of ${currentShareData.score}%!%0D%0A%0D%0ACertificate Number: ${currentShareData.certNumber}`;
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+            shareModal.hide();
+        }
+
+        function copyQuickNumber() {
+            navigator.clipboard.writeText(currentShareData.certNumber).then(function() {
+                showToast('Certificate number copied to clipboard!');
+                shareModal.hide();
+            });
+        }
+
+        function showToast(message) {
+            document.getElementById('toastMessage').textContent = message;
+            const toastEl = document.getElementById('shareToast');
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+    </script>
+}

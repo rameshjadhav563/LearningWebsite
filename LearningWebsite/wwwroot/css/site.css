@@ -1,0 +1,121 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+/* Employee Dashboard Action Buttons */
+#assignmentsTable .btn-group-vertical {
+    width: 100%;
+    gap: 4px;
+}
+
+#assignmentsTable .btn-group-vertical .btn {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+#assignmentsTable .btn-group-vertical .btn i {
+    font-size: 14px;
+}
+
+#assignmentsTable td:last-child {
+    min-width: 120px;
+    padding: 8px;
+}
+
+/* Professional Toast Notifications */
+#notificationToast {
+    min-width: 320px;
+    max-width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+#notificationToast .toast-body {
+    padding: 16px 12px;
+    display: flex;
+    align-items: center;
+}
+
+#notificationToast .toast-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+#notificationToast .toast-message {
+    flex: 1;
+    line-height: 1.4;
+}
+
+#notificationToast.bg-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+}
+
+#notificationToast.bg-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #e85d6c 100%) !important;
+}
+
+#notificationToast.bg-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #3dbacf 100%) !important;
+}
+
+#notificationToast.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ffcd39 100%) !important;
+}
+
+/* Toast animation */
+.toast.showing {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.toast.hide {
+    animation: slideOutRight 0.3s ease-in;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}

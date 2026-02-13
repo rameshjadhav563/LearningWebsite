@@ -1,0 +1,282 @@
+/* ============================================
+   TRAINING PAGE STYLES
+   Industrial Design System
+   ============================================ */
+
+.training-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.training-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.training-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    flex-shrink: 0;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.training-title-section {
+    flex: 1;
+}
+
+.training-title {
+    margin: 0 0 15px 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+}
+
+.training-meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.meta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.duration-badge {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    font-size: 16px;
+}
+
+.meta-badge i {
+    font-size: 16px;
+}
+
+.training-body {
+    padding: 40px;
+}
+
+/* Description Section */
+.description-section {
+    margin-bottom: 35px;
+    padding-bottom: 35px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.description-section h4 {
+    color: #2d3748;
+    font-weight: 700;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.description-section h4 i {
+    color: #667eea;
+}
+
+.description-text {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #4a5568;
+}
+
+/* Instructions Section */
+.instructions-section {
+    background: linear-gradient(135deg, #e0e7ff 0%, #fce7f3 100%);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border-left: 5px solid #667eea;
+}
+
+.instructions-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.instructions-header i {
+    font-size: 28px;
+    color: #667eea;
+}
+
+.instructions-header h5 {
+    margin: 0;
+    color: #2d3748;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.instructions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.instructions-list li {
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    color: #2d3748;
+    line-height: 1.6;
+}
+
+.instructions-list li i {
+    color: #48bb78;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* Status Section */
+.status-section {
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 30px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.status-success {
+    background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+    border-left: 5px solid #48bb78;
+}
+
+.status-warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-left: 5px solid #f59e0b;
+}
+
+.status-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.status-success .status-icon {
+    background: #48bb78;
+    color: white;
+}
+
+.status-warning .status-icon {
+    background: #f59e0b;
+    color: white;
+}
+
+.status-content {
+    flex: 1;
+}
+
+.status-content h5 {
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.status-content p {
+    margin: 0 0 15px 0;
+    color: #4a5568;
+}
+
+/* Action Section */
+.action-section {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    padding-top: 30px;
+    border-top: 2px solid #e2e8f0;
+}
+
+.btn-start {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 15px 35px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-start:hover {
+    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(72, 187, 120, 0.4);
+}
+
+.btn-start i {
+    font-size: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .training-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+    }
+
+    .training-title {
+        font-size: 24px;
+    }
+
+    .training-meta {
+        justify-content: center;
+    }
+
+    .training-body {
+        padding: 25px 20px;
+    }
+
+    .status-section {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .action-section {
+        flex-direction: column;
+    }
+
+    .action-section .btn {
+        width: 100%;
+    }
+}
