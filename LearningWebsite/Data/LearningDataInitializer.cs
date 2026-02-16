@@ -72,6 +72,13 @@ namespace LearningWebsite.Data
                         Description = "Introduction to cloud platforms and services",
                         Category = "Technical",
                         DurationInHours = 28
+                    },
+                    new Learning
+                    {
+                        Title = "Dot Net Full Stack",
+                        Description = "Complete .NET Full Stack Development covering beginner to intermediate concepts including C#, ASP.NET Core, Entity Framework, Web APIs, and more",
+                        Category = "Certification",
+                        DurationInHours = 80
                     }
                 };
 

@@ -25,8 +25,237 @@ namespace LearningWebsite.Data
             // Add sample questions for each learning
             foreach (var learning in learnings)
             {
+                // Add specific questions for Dot Net Full Stack Certification
+                if (learning.Title == "Dot Net Full Stack")
+                {
+                    // CompleteOcean Assessment - DotNet Full Stack Beginner Level
+                    questions.AddRange(new[]
+                    {
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What does CLR stand for in .NET?",
+                            OptionA = "Common Language Runtime",
+                            OptionB = "Core Language Repository",
+                            OptionC = "Common Library Resources",
+                            OptionD = "Core Language Runtime",
+                            CorrectAnswer = "A",
+                            DifficultyLevel = "Beginner"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "Which of the following is a value type in C#?",
+                            OptionA = "String",
+                            OptionB = "Integer",
+                            OptionC = "Array",
+                            OptionD = "Class",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Beginner"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What is the default access modifier for a class member in C#?",
+                            OptionA = "Public",
+                            OptionB = "Protected",
+                            OptionC = "Private",
+                            OptionD = "Internal",
+                            CorrectAnswer = "C",
+                            DifficultyLevel = "Beginner"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "Which keyword is used to inherit a class in C#?",
+                            OptionA = "extends",
+                            OptionB = "inherits",
+                            OptionC = "implements",
+                            OptionD = ":",
+                            CorrectAnswer = "D",
+                            DifficultyLevel = "Beginner"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What is the purpose of the 'using' statement in C#?",
+                            OptionA = "To import namespaces",
+                            OptionB = "To create objects",
+                            OptionC = "To define variables",
+                            OptionD = "To write comments",
+                            CorrectAnswer = "A",
+                            DifficultyLevel = "Beginner"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "Which collection type guarantees unique elements in C#?",
+                            OptionA = "List",
+                            OptionB = "Array",
+                            OptionC = "HashSet",
+                            OptionD = "Dictionary",
+                            CorrectAnswer = "C",
+                            DifficultyLevel = "Beginner"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What does MVC stand for?",
+                            OptionA = "Model View Component",
+                            OptionB = "Model View Controller",
+                            OptionC = "Multiple View Controller",
+                            OptionD = "Model Verification Controller",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Beginner"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "Which method is the entry point for a C# console application?",
+                            OptionA = "Start()",
+                            OptionB = "Main()",
+                            OptionC = "Run()",
+                            OptionD = "Execute()",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Beginner"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What is the correct way to declare a constant in C#?",
+                            OptionA = "constant int x = 10;",
+                            OptionB = "const int x = 10;",
+                            OptionC = "int const x = 10;",
+                            OptionD = "final int x = 10;",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Beginner"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "Which operator is used for string concatenation in C#?",
+                            OptionA = "&",
+                            OptionB = "+",
+                            OptionC = ".",
+                            OptionD = ",",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Beginner"
+                        },
+                        // CompleteOcean Assessment - DotNet Full Stack Intermediate Level
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What is the purpose of Entity Framework Core in .NET applications?",
+                            OptionA = "To manage database migrations only",
+                            OptionB = "To provide ORM capabilities for database operations",
+                            OptionC = "To create database schemas",
+                            OptionD = "To optimize SQL queries",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Intermediate"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "Which design pattern is commonly used for dependency injection in ASP.NET Core?",
+                            OptionA = "Factory Pattern",
+                            OptionB = "Singleton Pattern",
+                            OptionC = "Inversion of Control (IoC)",
+                            OptionD = "Observer Pattern",
+                            CorrectAnswer = "C",
+                            DifficultyLevel = "Intermediate"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What is the difference between IEnumerable and IQueryable in LINQ?",
+                            OptionA = "IEnumerable executes queries in-memory, IQueryable executes on the database",
+                            OptionB = "They are the same",
+                            OptionC = "IQueryable is faster than IEnumerable",
+                            OptionD = "IEnumerable supports filtering, IQueryable does not",
+                            CorrectAnswer = "A",
+                            DifficultyLevel = "Intermediate"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What is middleware in ASP.NET Core?",
+                            OptionA = "A database connection layer",
+                            OptionB = "Software components that handle HTTP requests and responses",
+                            OptionC = "A caching mechanism",
+                            OptionD = "A logging framework",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Intermediate"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "Which HTTP method is idempotent and safe?",
+                            OptionA = "POST",
+                            OptionB = "PUT",
+                            OptionC = "DELETE",
+                            OptionD = "GET",
+                            CorrectAnswer = "D",
+                            DifficultyLevel = "Intermediate"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What is the purpose of the async/await pattern in C#?",
+                            OptionA = "To run code in parallel",
+                            OptionB = "To write asynchronous code that is easier to read and maintain",
+                            OptionC = "To improve memory usage",
+                            OptionD = "To create background threads",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Intermediate"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "In ASP.NET Core, what is the difference between AddScoped, AddTransient, and AddSingleton?",
+                            OptionA = "They control the lifetime of dependency injection services",
+                            OptionB = "They define the scope of variables",
+                            OptionC = "They manage database connections",
+                            OptionD = "They configure middleware",
+                            CorrectAnswer = "A",
+                            DifficultyLevel = "Intermediate"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What is the purpose of DTOs (Data Transfer Objects)?",
+                            OptionA = "To transfer data between layers without exposing domain models",
+                            OptionB = "To store data in the database",
+                            OptionC = "To validate user input",
+                            OptionD = "To log application errors",
+                            CorrectAnswer = "A",
+                            DifficultyLevel = "Intermediate"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "Which attribute is used to specify routing in ASP.NET Core Web API?",
+                            OptionA = "[HttpRoute]",
+                            OptionB = "[Route]",
+                            OptionC = "[ApiRoute]",
+                            OptionD = "[Path]",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Intermediate"
+                        },
+                        new Question
+                        {
+                            LearningId = learning.Id,
+                            QuestionText = "What is the purpose of CORS (Cross-Origin Resource Sharing) in web applications?",
+                            OptionA = "To encrypt data transmission",
+                            OptionB = "To allow or restrict resources from different domains",
+                            OptionC = "To compress HTTP responses",
+                            OptionD = "To manage session state",
+                            CorrectAnswer = "B",
+                            DifficultyLevel = "Intermediate"
+                        }
+                    });
+                }
                 // Add 15 questions per learning topic
-                if (learning.Category == "Technical")
+                else if (learning.Category == "Technical")
                 {
                     questions.AddRange(new[]
                     {

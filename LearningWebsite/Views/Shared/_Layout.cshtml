@@ -3,82 +3,214 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - LearningWebsite</title>
+    <title>@ViewData["Title"] - Learning Platform</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/LearningWebsite.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <style>
+        :root {
+            --industrial-white: #ffffff;
+            --industrial-light-gray: #f8f9fa;
+            --industrial-gray: #e9ecef;
+            --industrial-border: #dee2e6;
+            --industrial-accent: #ff6b35;
+            --industrial-text: #2c3e50;
+        }
+        body {
+            background: var(--industrial-light-gray);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .industrial-header {
+            background: var(--industrial-white);
+            border-bottom: 4px solid var(--industrial-accent);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .navbar-brand {
+            color: var(--industrial-text) !important;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+        }
+        .navbar-light .nav-link {
+            color: var(--industrial-text) !important;
+            font-weight: 600;
+            padding: 0.5rem 1.2rem !important;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        .navbar-light .nav-link:hover {
+            color: var(--industrial-accent) !important;
+        }
+        .btn-industrial {
+            background: var(--industrial-accent);
+            color: white;
+            border: none;
+            padding: 0.6rem 2rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            border-radius: 0;
+        }
+        .btn-industrial:hover {
+            background: #e55a2b;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+        }
+        .dropdown-menu {
+            background: var(--industrial-white);
+            border: 2px solid var(--industrial-border);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 0.5rem 0;
+            min-width: 200px;
+        }
+        .dropdown-item {
+            color: var(--industrial-text);
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            transition: all 0.2s;
+        }
+        .dropdown-item:hover {
+            background: var(--industrial-gray);
+            color: var(--industrial-accent);
+            padding-left: 1.5rem;
+        }
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+        .dropdown-item.text-danger:hover {
+            background: #dc3545;
+            color: white !important;
+        }
+        .dropdown-divider {
+            border-color: var(--industrial-border);
+            margin: 0.5rem 0;
+        }
+        .nav-link.dropdown-toggle {
+            display: flex;
+            align-items: center;
+        }
+        .industrial-footer {
+            background: var(--industrial-white);
+            color: var(--industrial-text);
+            border-top: 4px solid var(--industrial-accent);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: auto;
+        }
+        main {
+            flex: 1;
+            width: 100%;
+            max-width: 100%;
+        }
+        .container-fluid {
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        .navbar-toggler {
+            border: 2px solid var(--industrial-accent);
+        }
+    </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">LearningWebsite</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+    <header class="industrial-header">
+        <nav class="navbar navbar-expand-sm navbar-light">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-industry"></i> LEARNING PLATFORM
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>                        
-                    </ul>
-
-                    <ul class="navbar-nav">
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
                         @if (User?.Identity?.IsAuthenticated ?? false)
                         {
-                            <li class="nav-item"><span class="nav-link">Hello @User.Identity.Name</span></li>
-
-                            @* Profile Links *@
-                            @if (User.IsInRole("Employee")) 
-                            { 
-                                <li class="nav-item"><a class="nav-link" asp-controller="Employee" asp-action="MyProfile"><i class="fas fa-user-circle"></i> My Profile</a></li> 
+                            @if (User.IsInRole("Employee"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Employee" asp-action="Index">DASHBOARD</a>
+                                </li>
                             }
-                            @if (User.IsInRole("Manager")) 
-                            { 
-                                <li class="nav-item"><a class="nav-link" asp-controller="Manager" asp-action="MyProfile"><i class="fas fa-user-circle"></i> My Profile</a></li> 
+                            @if (User.IsInRole("Manager"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Manager" asp-action="Index">DASHBOARD</a>
+                                </li>
                             }
-
-                            <li class="nav-item"><form method="post" asp-controller="Account" asp-action="Logout" class="form-inline"><button type="submit" class="btn btn-link nav-link">Logout</button></form></li>
-
-                            @* Optional quick links to dashboards if in role *@
-                            @if (User.IsInRole("Employee")) { <li class="nav-item"><a class="nav-link" asp-controller="Employee" asp-action="Index">Dashboard</a></li> }
-                            @if (User.IsInRole("Manager")) { <li class="nav-item"><a class="nav-link" asp-controller="Manager" asp-action="Index">Dashboard</a></li> }
-                            @if (User.IsInRole("HR")) { <li class="nav-item"><a class="nav-link" asp-controller="HR" asp-action="Index">HR Dashboard</a></li> }
+                            @if (User.IsInRole("HR"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="HR" asp-action="Index">DASHBOARD</a>
+                                </li>
+                            }
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-1"></i> @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    @if (User.IsInRole("Employee"))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Employee" asp-action="MyProfile"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                                    }
+                                    @if (User.IsInRole("Manager"))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Manager" asp-action="MyProfile"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Manager" asp-action="TeamMetrics"><i class="fas fa-chart-line me-2"></i>Team Metrics</a></li>
+                                    }
+                                    @if (User.IsInRole("HR"))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="HR" asp-action="ManageUsers"><i class="fas fa-users-cog me-2"></i>Manage Users</a></li>
+                                    }
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="post" asp-controller="Account" asp-action="Logout">
+                                            <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
                         }
                         else
                         {
-                            <li class="nav-item"><a class="nav-link btn btn-primary text-white ms-2" asp-controller="Account" asp-action="Login">Login</a></li>
+                            <li class="nav-item">
+                                <a class="btn btn-industrial" asp-controller="Account" asp-action="Login">LOGIN</a>
+                            </li>
                         }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - LearningWebsite - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer class="industrial-footer py-3">
+        <div class="container text-center">
+            &copy; @DateTime.Now.Year LEARNING PLATFORM
         </div>
     </footer>
 
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 11000;">
-        <div id="notificationToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="notificationToast" class="toast" role="alert">
             <div class="d-flex">
                 <div class="toast-body">
                     <i class="toast-icon me-2"></i>
                     <span class="toast-message"></span>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         </div>
     </div>

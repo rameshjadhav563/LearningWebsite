@@ -1,0 +1,593 @@
+@model LearningWebsite.Models.TeamMetricsViewModel
+
+@{
+    ViewData["Title"] = "Team Learning Metrics";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="display-4">
+                        <i class="fas fa-chart-line text-primary"></i> Team Learning Metrics
+                    </h1>
+                    <p class="text-muted lead">Dashboard for monitoring team learning progress and performance</p>
+                </div>
+                <div>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Team Members</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalTeamMembers</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Assignments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalAssignments</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Team Completion Rate</div>
+                            <div class="row no-gutters align-items-center">
+                                <div class="col-auto">
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@Model.TeamCompletionRate%</div>
+                                </div>
+                                <div class="col">
+                                    <div class="progress progress-sm mr-2">
+                                        <div class="progress-bar bg-info" role="progressbar" 
+                                             style="width: @Model.TeamCompletionRate%" 
+                                             aria-valuenow="@Model.TeamCompletionRate" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Overdue Assignments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.OverdueAssignments</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Status Distribution -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-chart-pie"></i> Assignment Status Distribution
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart"></canvas>
+                    <div class="mt-4 text-center">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <span class="badge bg-success" style="font-size: 1rem; padding: 10px;">
+                                    Completed: @Model.CompletedAssignments
+                                </span>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="badge bg-info" style="font-size: 1rem; padding: 10px;">
+                                    In Progress: @Model.InProgressAssignments
+                                </span>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="badge bg-secondary" style="font-size: 1rem; padding: 10px;">
+                                    Not Started: @Model.NotStartedAssignments
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 bg-info text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-chart-bar"></i> Category Performance
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.CategoryMetrics.Any())
+                    {
+                        <canvas id="categoryChart"></canvas>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No category data available yet.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Member Performance Table -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-success text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-user-chart"></i> Individual Team Member Performance
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.TeamMemberMetrics.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="teamMetricsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Team Member</th>
+                                        <th>Total Assignments</th>
+                                        <th>Completed</th>
+                                        <th>In Progress</th>
+                                        <th>Not Started</th>
+                                        <th>Overdue</th>
+                                        <th>Completion Rate</th>
+                                        <th>Avg Progress</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var member in Model.TeamMemberMetrics)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@member.UserName</strong>
+                                                @if (!string.IsNullOrEmpty(member.FullName))
+                                                {
+                                                    <br />
+                                                    <small class="text-muted">@member.FullName</small>
+                                                }
+                                            </td>
+                                            <td><span class="badge bg-primary">@member.TotalAssignments</span></td>
+                                            <td><span class="badge bg-success">@member.CompletedAssignments</span></td>
+                                            <td><span class="badge bg-info">@member.InProgressAssignments</span></td>
+                                            <td><span class="badge bg-secondary">@member.NotStartedAssignments</span></td>
+                                            <td>
+                                                @if (member.OverdueAssignments > 0)
+                                                {
+                                                    <span class="badge bg-danger">@member.OverdueAssignments</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-light text-dark">0</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1 me-2" style="height: 20px; min-width: 80px;">
+                                                        <div class="progress-bar @(member.CompletionRate >= 75 ? "bg-success" : 
+                                                                                    member.CompletionRate >= 50 ? "bg-info" : 
+                                                                                    member.CompletionRate >= 25 ? "bg-warning" : "bg-danger")" 
+                                                             role="progressbar" 
+                                                             style="width: @member.CompletionRate%"
+                                                             aria-valuenow="@member.CompletionRate" 
+                                                             aria-valuemin="0" 
+                                                             aria-valuemax="100">
+                                                            @member.CompletionRate%
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-primary">@member.AverageProgress%</span>
+                                            </td>
+                                            <td>
+                                                <a asp-action="TeamMemberDetail" 
+                                                   asp-route-id="@member.UserId" 
+                                                   class="btn btn-sm btn-info"
+                                                   title="View Details">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination for Team Members -->
+                        @if (Model.TeamMemberMetrics.TotalPages > 1)
+                        {
+                            <nav aria-label="Team members pagination" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item @(!Model.TeamMemberMetrics.HasPreviousPage ? "disabled" : "")">
+                                        <a class="page-link" asp-action="TeamMetrics" asp-route-teamMemberPage="@(Model.TeamMemberMetrics.PageIndex - 1)" asp-route-categoryPage="@Model.CategoryMetrics.PageIndex" asp-route-activityPage="@Model.RecentActivities.PageIndex" asp-route-pageSize="@Model.TeamMemberMetrics.PageSize">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </a>
+                                    </li>
+
+                                    @for (int i = 1; i <= Model.TeamMemberMetrics.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == Model.TeamMemberMetrics.PageIndex ? "active" : "")">
+                                            <a class="page-link" asp-action="TeamMetrics" asp-route-teamMemberPage="@i" asp-route-categoryPage="@Model.CategoryMetrics.PageIndex" asp-route-activityPage="@Model.RecentActivities.PageIndex" asp-route-pageSize="@Model.TeamMemberMetrics.PageSize">@i</a>
+                                        </li>
+                                    }
+
+                                    <li class="page-item @(!Model.TeamMemberMetrics.HasNextPage ? "disabled" : "")">
+                                        <a class="page-link" asp-action="TeamMetrics" asp-route-teamMemberPage="@(Model.TeamMemberMetrics.PageIndex + 1)" asp-route-categoryPage="@Model.CategoryMetrics.PageIndex" asp-route-activityPage="@Model.RecentActivities.PageIndex" asp-route-pageSize="@Model.TeamMemberMetrics.PageSize">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="text-center text-muted">
+                                    <small>
+                                        Showing @((Model.TeamMemberMetrics.PageIndex - 1) * Model.TeamMemberMetrics.PageSize + 1) 
+                                        to @Math.Min(Model.TeamMemberMetrics.PageIndex * Model.TeamMemberMetrics.PageSize, Model.TeamMemberMetrics.TotalCount) 
+                                        of @Model.TeamMemberMetrics.TotalCount members
+                                    </small>
+                                </div>
+                            </nav>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No team members found or no assignments yet.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Metrics -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-secondary text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-layer-group"></i> Category Completion Metrics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.CategoryMetrics.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Total Assignments</th>
+                                        <th>Completed</th>
+                                        <th>Completion Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var category in Model.CategoryMetrics)
+                                    {
+                                        <tr>
+                                            <td><strong>@category.Category</strong></td>
+                                            <td><span class="badge bg-info">@category.TotalAssignments</span></td>
+                                            <td><span class="badge bg-success">@category.CompletedAssignments</span></td>
+                                            <td>
+                                                <div class="progress" style="height: 25px;">
+                                                    <div class="progress-bar @(category.CompletionRate >= 70 ? "bg-success" : category.CompletionRate >= 40 ? "bg-warning" : "bg-danger")"
+                                                         role="progressbar"
+                                                         style="width: @category.CompletionRate%"
+                                                         aria-valuenow="@category.CompletionRate"
+                                                         aria-valuemin="0"
+                                                         aria-valuemax="100">
+                                                        @category.CompletionRate%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination for Categories -->
+                        @if (Model.CategoryMetrics.TotalPages > 1)
+                        {
+                            <nav aria-label="Categories pagination" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item @(!Model.CategoryMetrics.HasPreviousPage ? "disabled" : "")">
+                                        <a class="page-link" asp-action="TeamMetrics" asp-route-teamMemberPage="@Model.TeamMemberMetrics.PageIndex" asp-route-categoryPage="@(Model.CategoryMetrics.PageIndex - 1)" asp-route-activityPage="@Model.RecentActivities.PageIndex" asp-route-pageSize="@Model.CategoryMetrics.PageSize">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </a>
+                                    </li>
+
+                                    @for (int i = 1; i <= Model.CategoryMetrics.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == Model.CategoryMetrics.PageIndex ? "active" : "")">
+                                            <a class="page-link" asp-action="TeamMetrics" asp-route-teamMemberPage="@Model.TeamMemberMetrics.PageIndex" asp-route-categoryPage="@i" asp-route-activityPage="@Model.RecentActivities.PageIndex" asp-route-pageSize="@Model.CategoryMetrics.PageSize">@i</a>
+                                        </li>
+                                    }
+
+                                    <li class="page-item @(!Model.CategoryMetrics.HasNextPage ? "disabled" : "")">
+                                        <a class="page-link" asp-action="TeamMetrics" asp-route-teamMemberPage="@Model.TeamMemberMetrics.PageIndex" asp-route-categoryPage="@(Model.CategoryMetrics.PageIndex + 1)" asp-route-activityPage="@Model.RecentActivities.PageIndex" asp-route-pageSize="@Model.CategoryMetrics.PageSize">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="text-center text-muted">
+                                    <small>
+                                        Showing @((Model.CategoryMetrics.PageIndex - 1) * Model.CategoryMetrics.PageSize + 1) 
+                                        to @Math.Min(Model.CategoryMetrics.PageIndex * Model.CategoryMetrics.PageSize, Model.CategoryMetrics.TotalCount) 
+                                        of @Model.CategoryMetrics.TotalCount categories
+                                    </small>
+                                </div>
+                            </nav>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No category data available yet.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-warning text-dark">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-history"></i> Recent Learning Activities
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentActivities.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Team Member</th>
+                                        <th>Learning</th>
+                                        <th>Activity</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var activity in Model.RecentActivities)
+                                    {
+                                        <tr>
+                                            <td><strong>@activity.UserName</strong></td>
+                                            <td>@activity.LearningTitle</td>
+                                            <td>
+                                                @if (activity.ActivityType == "Completed")
+                                                {
+                                                    <i class="fas fa-check-circle text-success"></i>
+                                                    <span>Completed</span>
+                                                }
+                                                else if (activity.ActivityType == "Started")
+                                                {
+                                                    <i class="fas fa-play-circle text-info"></i>
+                                                    <span>Started</span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-plus-circle text-secondary"></i>
+                                                    <span>Assigned</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge @(activity.Status == "Completed" ? "bg-success" : 
+                                                                      activity.Status == "InProgress" ? "bg-info" : "bg-secondary")">
+                                                    @activity.Status
+                                                </span>
+                                            </td>
+                                            <td>@activity.ActivityDate.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination for Recent Activities -->
+                        @if (Model.RecentActivities.TotalPages > 1)
+                        {
+                            <nav aria-label="Activities pagination" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item @(!Model.RecentActivities.HasPreviousPage ? "disabled" : "")">
+                                        <a class="page-link" asp-action="TeamMetrics" asp-route-teamMemberPage="@Model.TeamMemberMetrics.PageIndex" asp-route-categoryPage="@Model.CategoryMetrics.PageIndex" asp-route-activityPage="@(Model.RecentActivities.PageIndex - 1)" asp-route-pageSize="@Model.RecentActivities.PageSize">
+                                            <i class="fas fa-chevron-left"></i> Previous
+                                        </a>
+                                    </li>
+
+                                    @for (int i = 1; i <= Model.RecentActivities.TotalPages; i++)
+                                    {
+                                        <li class="page-item @(i == Model.RecentActivities.PageIndex ? "active" : "")">
+                                            <a class="page-link" asp-action="TeamMetrics" asp-route-teamMemberPage="@Model.TeamMemberMetrics.PageIndex" asp-route-categoryPage="@Model.CategoryMetrics.PageIndex" asp-route-activityPage="@i" asp-route-pageSize="@Model.RecentActivities.PageSize">@i</a>
+                                        </li>
+                                    }
+
+                                    <li class="page-item @(!Model.RecentActivities.HasNextPage ? "disabled" : "")">
+                                        <a class="page-link" asp-action="TeamMetrics" asp-route-teamMemberPage="@Model.TeamMemberMetrics.PageIndex" asp-route-categoryPage="@Model.CategoryMetrics.PageIndex" asp-route-activityPage="@(Model.RecentActivities.PageIndex + 1)" asp-route-pageSize="@Model.RecentActivities.PageSize">
+                                            Next <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="text-center text-muted">
+                                    <small>
+                                        Showing @((Model.RecentActivities.PageIndex - 1) * Model.RecentActivities.PageSize + 1) 
+                                        to @Math.Min(Model.RecentActivities.PageIndex * Model.RecentActivities.PageSize, Model.RecentActivities.TotalCount) 
+                                        of @Model.RecentActivities.TotalCount activities
+                                    </small>
+                                </div>
+                            </nav>
+                        }
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No recent activities to display.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Status Distribution Pie Chart
+        const statusCtx = document.getElementById('statusChart');
+        if (statusCtx) {
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'Not Started'],
+                    datasets: [{
+                        data: [@Model.CompletedAssignments, @Model.InProgressAssignments, @Model.NotStartedAssignments],
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.8)',   // Success green
+                            'rgba(23, 162, 184, 0.8)',  // Info blue
+                            'rgba(108, 117, 125, 0.8)'  // Secondary gray
+                        ],
+                        borderColor: [
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(23, 162, 184, 1)',
+                            'rgba(108, 117, 125, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Category Performance Bar Chart
+        const categoryCtx = document.getElementById('categoryChart');
+        if (categoryCtx && @Model.CategoryMetrics.Any().ToString().ToLower()) {
+            new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: [@Html.Raw(string.Join(",", Model.CategoryMetrics.Select(c => $"'{c.Category}'")))],
+                    datasets: [{
+                        label: 'Completion Rate (%)',
+                        data: [@string.Join(",", Model.CategoryMetrics.Select(c => c.CompletionRate))],
+                        backgroundColor: 'rgba(23, 162, 184, 0.8)',
+                        borderColor: 'rgba(23, 162, 184, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}
+
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .card {
+        border-radius: 0.35rem;
+    }
+    .progress-sm {
+        height: 0.5rem;
+    }
+    .text-xs {
+        font-size: 0.7rem;
+    }
+</style>

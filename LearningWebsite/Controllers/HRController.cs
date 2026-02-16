@@ -23,7 +23,7 @@ namespace LearningWebsite.Controllers
         }
 
         // Dashboard
-        public IActionResult Index()
+        public IActionResult Index(int pageNumber = 1, int pageSize = 10)
         {
             _logger.LogInformation("HR dashboard opened by {User}", User.Identity?.Name);
 
@@ -33,10 +33,12 @@ namespace LearningWebsite.Controllers
             var hrUsers = users.Where(u => u.Role == "HR").ToList();
 
             // Get all assignments with related data
-            var allAssignments = _context.LearningAssignments
+            var allAssignmentsQuery = _context.LearningAssignments
                 .Include(a => a.User)
                 .Include(a => a.Learning)
-                .ToList();
+                .OrderByDescending(a => a.AssignedDate);
+
+            var allAssignments = allAssignmentsQuery.ToList();
 
             // Calculate metrics
             var totalAssignments = allAssignments.Count;
@@ -48,7 +50,8 @@ namespace LearningWebsite.Controllers
             // Category analysis
             var categoryStats = _context.LearningAssignments
                 .Include(a => a.Learning)
-                .GroupBy(a => a.Learning.Category)
+                .Where(a => a.Learning != null)
+                .GroupBy(a => a.Learning!.Category)
                 .Select(g => new
                 {
                     Category = g.Key,
@@ -57,6 +60,9 @@ namespace LearningWebsite.Controllers
                     CompletionRate = g.Count() > 0 ? (g.Count(a => a.Status == "Completed") * 100 / g.Count()) : 0
                 })
                 .ToList();
+
+            // Create paginated list for assignments
+            var paginatedAssignments = PaginatedList<LearningAssignment>.Create(allAssignments, pageNumber, pageSize);
 
             ViewBag.TotalUsers = users.Count;
             ViewBag.TotalEmployees = employees.Count;
@@ -72,8 +78,8 @@ namespace LearningWebsite.Controllers
             ViewBag.NotStartedAssignments = notStartedAssignments;
             ViewBag.CompletionRate = completionRate;
 
-            // All assignments for table
-            ViewBag.AllAssignments = allAssignments.OrderByDescending(a => a.AssignedDate).Take(50).ToList();
+            // All assignments for table (paginated)
+            ViewBag.AllAssignments = paginatedAssignments;
 
             // Category stats
             ViewBag.CategoryStats = categoryStats;

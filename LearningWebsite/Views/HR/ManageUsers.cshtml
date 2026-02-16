@@ -2,40 +2,124 @@
 
 @{
     ViewData["Title"] = "Manage Users";
+    var totalUsers = Model.Count;
+    var employeeCount = Model.Count(u => u.Role == "Employee");
+    var managerCount = Model.Count(u => u.Role == "Manager");
+    var hrCount = Model.Count(u => u.Role == "HR");
 }
 
 <div class="container-fluid mt-4">
+    <!-- Page Header -->
     <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>Manage All Users</h1>
-            <p class="text-muted">Full CRUD access to user management</p>
-        </div>
-        <div class="col-md-4 text-end">
-            <a class="btn btn-success btn-lg" asp-action="CreateUser">
-                <i class="fas fa-user-plus"></i> Create New User
-            </a>
-            <a class="btn btn-secondary" asp-action="Index">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div class="mb-3 mb-md-0">
+                    <h1 class="h2 mb-2">
+                        <i class="fas fa-users-cog text-primary"></i> Manage All Users
+                    </h1>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-info-circle"></i> Full CRUD access to user management
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-success shadow-sm" asp-action="CreateUser">
+                        <i class="fas fa-user-plus"></i> Create New User
+                    </a>
+                    <a class="btn btn-outline-secondary shadow-sm" asp-action="Index">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Success!</strong> @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1" style="font-size: 0.75rem; opacity: 0.9;">Total Users</h6>
+                            <h2 class="mb-0 fw-bold">@totalUsers</h2>
+                        </div>
+                        <div>
+                            <i class="fas fa-users fa-3x" style="opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1" style="font-size: 0.75rem; opacity: 0.9;">Employees</h6>
+                            <h2 class="mb-0 fw-bold">@employeeCount</h2>
+                        </div>
+                        <div>
+                            <i class="fas fa-user-tie fa-3x" style="opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1" style="font-size: 0.75rem; opacity: 0.9;">Managers</h6>
+                            <h2 class="mb-0 fw-bold">@managerCount</h2>
+                        </div>
+                        <div>
+                            <i class="fas fa-user-friends fa-3x" style="opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase mb-1" style="font-size: 0.75rem; opacity: 0.9;">HR Admins</h6>
+                            <h2 class="mb-0 fw-bold">@hrCount</h2>
+                        </div>
+                        <div>
+                            <i class="fas fa-user-shield fa-3x" style="opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Filters -->
-    <div class="card shadow mb-4">
+    <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search by username, name, or email...">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-5">
+                    <label class="form-label small text-muted mb-1">
+                        <i class="fas fa-search"></i> Search Users
+                    </label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Type to search by username, name, or email...">
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">
+                        <i class="fas fa-filter"></i> Filter by Role
+                    </label>
                     <select id="roleFilter" class="form-select">
                         <option value="">All Roles</option>
                         <option value="Employee">Employee</option>
@@ -43,107 +127,171 @@
                         <option value="HR">HR Admin</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <span class="badge bg-primary p-2">Total: @Model.Count users</span>
-                    <span class="badge bg-success p-2">Employees: @Model.Count(u => u.Role == "Employee")</span>
-                    <span class="badge bg-info p-2">Managers: @Model.Count(u => u.Role == "Manager")</span>
-                    <span class="badge bg-danger p-2">HR: @Model.Count(u => u.Role == "HR")</span>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted mb-1 d-block">
+                        <i class="fas fa-chart-pie"></i> Quick Stats
+                    </label>
+                    <div class="d-flex flex-wrap gap-1">
+                        <span class="badge bg-primary">@totalUsers Total</span>
+                        <span class="badge bg-success">@employeeCount Employees</span>
+                        <span class="badge bg-info">@managerCount Managers</span>
+                        <span class="badge bg-danger">@hrCount HR</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Users Table -->
-    <div class="card shadow">
-        <div class="card-header py-3 bg-primary text-white">
-            <h6 class="m-0 font-weight-bold">All Users (@Model.Count)</h6>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fas fa-table text-primary"></i> All Users
+                    <span class="badge bg-primary rounded-pill ms-2">@totalUsers</span>
+                </h5>
+            </div>
         </div>
-        <div class="card-body">
+        <div class="card-body p-0">
             @if (Model.Any())
             {
                 <div class="table-responsive">
-                    <table class="table table-hover" id="usersTable">
-                        <thead class="table-light">
+                    <table class="table table-hover align-middle mb-0 modern-table" id="usersTable" style="width:100%;">
+                        <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Username</th>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Manager</th>
-                                <th>Actions</th>
+                                <th class="border-bottom px-4 py-3" style="width: 70px;">
+                                    <span class="text-uppercase fw-semibold text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">No.</span>
+                                </th>
+                                <th class="border-bottom px-4 py-3" style="width: 200px;">
+                                    <span class="text-uppercase fw-semibold text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">Username</span>
+                                </th>
+                                <th class="border-bottom px-4 py-3" style="width: 200px;">
+                                    <span class="text-uppercase fw-semibold text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">Full Name</span>
+                                </th>
+                                <th class="border-bottom px-4 py-3" style="width: 240px;">
+                                    <span class="text-uppercase fw-semibold text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">Email Address</span>
+                                </th>
+                                <th class="border-bottom px-4 py-3" style="width: 140px;">
+                                    <span class="text-uppercase fw-semibold text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">Role</span>
+                                </th>
+                                <th class="border-bottom px-4 py-3" style="width: 180px;">
+                                    <span class="text-uppercase fw-semibold text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">Manager</span>
+                                </th>
+                                <th class="border-bottom px-4 py-3 text-center" style="width: 200px;">
+                                    <span class="text-uppercase fw-semibold text-muted" style="font-size: 0.7rem; letter-spacing: 0.5px;">Actions</span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var user in Model)
                             {
-                                <tr class="user-row" data-role="@user.Role">
-                                    <td>@user.Id</td>
-                                    <td><strong>@user.UserName</strong></td>
-                                    <td>@(user.FullName ?? "-")</td>
-                                    <td>@(user.Email ?? "-")</td>
-                                    <td>
+                                <tr class="user-row border-bottom" data-role="@user.Role" data-user-id="@user.Id">
+                                    <td class="px-4 py-4 text-center">
+                                        <span class="text-muted fw-medium"></span>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="user-avatar me-3">
+                                                <div class="avatar-circle">
+                                                    <span class="avatar-initials">@user.UserName.Substring(0, 2).ToUpper()</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold text-dark mb-1" style="font-size: 0.95rem;">@user.UserName</div>
+                                                <div class="text-muted" style="font-size: 0.8rem;">ID: @user.Id</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <span class="text-secondary fw-medium">@(user.FullName ?? "-")</span>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-envelope text-muted me-2" style="font-size: 0.85rem;"></i>
+                                            <span class="text-muted">@(user.Email ?? "-")</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-4">
                                         @if (user.Role == "Employee")
                                         {
-                                            <span class="badge bg-primary">Employee</span>
+                                            <span class="role-badge role-badge-employee">
+                                                <i class="fas fa-user me-1"></i>Employee
+                                            </span>
                                         }
                                         else if (user.Role == "Manager")
                                         {
-                                            <span class="badge bg-success">Manager</span>
+                                            <span class="role-badge role-badge-manager">
+                                                <i class="fas fa-user-tie me-1"></i>Manager
+                                            </span>
                                         }
                                         else if (user.Role == "HR")
                                         {
-                                            <span class="badge bg-danger">HR Admin</span>
+                                            <span class="role-badge role-badge-hr">
+                                                <i class="fas fa-user-shield me-1"></i>HR Admin
+                                            </span>
                                         }
                                     </td>
-                                    <td>@(user.Manager?.UserName ?? "-")</td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <a class="btn btn-sm btn-info" asp-action="UserDetails" asp-route-id="@user.Id" title="View Details">
+                                    <td class="px-4 py-4">
+                                        @if (user.Manager != null)
+                                        {
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-user-tie text-primary me-2" style="font-size: 0.85rem;"></i>
+                                                <span class="text-dark fw-medium">@user.Manager.UserName</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a class="btn btn-sm btn-outline-info" asp-action="UserDetails" asp-route-id="@user.Id" data-bs-toggle="tooltip" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a class="btn btn-sm btn-warning" asp-action="EditUser" asp-route-id="@user.Id" title="Edit User">
+                                            <a class="btn btn-sm btn-outline-warning" asp-action="EditUser" asp-route-id="@user.Id" data-bs-toggle="tooltip" title="Edit User">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a class="btn btn-sm btn-danger" asp-action="DeleteUser" asp-route-id="@user.Id" title="Delete User">
-                                                <i class="fas fa-trash"></i>
+                                            <a class="btn btn-sm btn-outline-danger" asp-action="DeleteUser" asp-route-id="@user.Id" data-bs-toggle="tooltip" title="Delete User">
+                                                <i class="fas fa-trash-alt"></i>
                                             </a>
-                                        </div>
 
-                                        <!-- Quick Role Change -->
-                                        <div class="btn-group ms-2" role="group">
-                                            <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                Role
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <form method="post" asp-action="AssignRole" style="display:inline;">
-                                                        <input type="hidden" name="userId" value="@user.Id" />
-                                                        <input type="hidden" name="role" value="Employee" />
-                                                        <button type="submit" class="dropdown-item">
-                                                            <i class="fas fa-user"></i> Set as Employee
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                                <li>
-                                                    <form method="post" asp-action="AssignRole" style="display:inline;">
-                                                        <input type="hidden" name="userId" value="@user.Id" />
-                                                        <input type="hidden" name="role" value="Manager" />
-                                                        <button type="submit" class="dropdown-item">
-                                                            <i class="fas fa-users"></i> Set as Manager
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                                <li>
-                                                    <form method="post" asp-action="AssignRole" style="display:inline;">
-                                                        <input type="hidden" name="userId" value="@user.Id" />
-                                                        <input type="hidden" name="role" value="HR" />
-                                                        <button type="submit" class="dropdown-item">
-                                                            <i class="fas fa-user-shield"></i> Set as HR
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-user-cog"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <li><h6 class="dropdown-header">Change Role</h6></li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <form method="post" asp-action="AssignRole" class="role-form">
+                                                            <input type="hidden" name="userId" value="@user.Id" />
+                                                            <input type="hidden" name="role" value="Employee" />
+                                                            <button type="submit" class="dropdown-item">
+                                                                <i class="fas fa-user text-primary me-2"></i> Employee
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                    <li>
+                                                        <form method="post" asp-action="AssignRole" class="role-form">
+                                                            <input type="hidden" name="userId" value="@user.Id" />
+                                                            <input type="hidden" name="role" value="Manager" />
+                                                            <button type="submit" class="dropdown-item">
+                                                                <i class="fas fa-user-tie text-success me-2"></i> Manager
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                    <li>
+                                                        <form method="post" asp-action="AssignRole" class="role-form">
+                                                            <input type="hidden" name="userId" value="@user.Id" />
+                                                            <input type="hidden" name="role" value="HR" />
+                                                            <button type="submit" class="dropdown-item">
+                                                                <i class="fas fa-user-shield text-danger me-2"></i> HR Admin
+                                                            </button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -154,51 +302,251 @@
             }
             else
             {
-                <div class="alert alert-info">No users found in the system.</div>
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">No users found in the system</h5>
+                    <p class="text-muted">Start by creating a new user</p>
+                    <a class="btn btn-primary mt-2" asp-action="CreateUser">
+                        <i class="fas fa-plus"></i> Create First User
+                    </a>
+                </div>
             }
         </div>
     </div>
 </div>
 
+@section Styles {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
+    <style>
+        /* Simple Clean Table Design */
+        .modern-table {
+            font-size: 0.9rem;
+        }
+
+        .modern-table thead th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .modern-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .modern-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* User Avatar */
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-initials {
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        /* Role Badges */
+        .role-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-badge-employee {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .role-badge-manager {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .role-badge-hr {
+            background-color: #fce4ec;
+            color: #c2185b;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #dee2e6;
+            min-width: 200px;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .role-form {
+            margin: 0;
+        }
+
+        .role-form button {
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: none;
+        }
+
+        /* DataTables Styling */
+        .dataTables_wrapper {
+            padding: 1rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.5rem 0.75rem;
+            margin: 0 2px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #0d6efd;
+            color: white !important;
+            border-color: #0d6efd;
+        }
+
+        /* Cards */
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Statistics Cards Animation */
+        .row.g-3 > div {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+}
+
 @section Scripts {
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
     <script>
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const searchValue = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#usersTable tbody tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchValue) ? '' : 'none';
-            });
-        });
+        $(document).ready(function() {
+            // Initialize tooltips
+            $('[data-bs-toggle="tooltip"]').tooltip();
 
-        // Role filter
-        document.getElementById('roleFilter').addEventListener('change', function() {
-            const roleValue = this.value;
-            const rows = document.querySelectorAll('.user-row');
-            
-            rows.forEach(row => {
-                if (roleValue === '' || row.dataset.role === roleValue) {
-                    row.style.display = '';
+            // Initialize DataTable
+            var table = $('#usersTable').DataTable({
+                pageLength: 10,
+                responsive: true,
+                order: [[1, 'asc']],
+                columnDefs: [
+                    {
+                        targets: 0,
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        targets: -1,
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search users...",
+                    lengthMenu: "Show _MENU_ users",
+                    info: "Showing _START_ to _END_ of _TOTAL_ users",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Prev"
+                    }
+                }
+            });
+
+            // Add serial numbers
+            table.on('order.dt search.dt', function () {
+                let i = 1;
+                table.cells(null, 0, { search: 'applied', order: 'applied' }).every(function () {
+                    this.data(i++);
+                });
+            }).draw();
+
+            // Custom search
+            $('#searchInput').on('keyup', function() {
+                table.search(this.value).draw();
+            });
+
+            // Role filter
+            $('#roleFilter').on('change', function() {
+                var val = this.value;
+                table.column(4).search(val ? '^' + val + '$' : '', true, false).draw();
+            });
+
+            // Role change confirmation
+            $(document).on('submit', '.role-form', function(e) {
+                e.preventDefault();
+                const role = $(this).find('input[name="role"]').val();
+                const username = $(this).closest('tr').find('td:eq(1) .fw-semibold').text().trim();
+
+                if (confirm(`Change ${username}'s role to ${role}?`)) {
+                    this.submit();
+                }
+            });
+
+            // Scroll to top button
+            $(window).scroll(function() {
+                if ($(this).scrollTop() > 200) {
+                    $('#scrollTopBtn').fadeIn();
                 } else {
-                    row.style.display = 'none';
+                    $('#scrollTopBtn').fadeOut();
                 }
             });
-        });
 
-        // Confirm role change
-        document.querySelectorAll('form[action*="AssignRole"]').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                const role = this.querySelector('input[name="role"]').value;
-                if (!confirm(`Are you sure you want to change this user's role to ${role}?`)) {
-                    e.preventDefault();
-                }
+            $('#scrollTopBtn').click(function() {
+                $('html, body').animate({scrollTop: 0}, 500);
+                return false;
             });
+
+            // Auto-dismiss success alerts
+            setTimeout(function() {
+                $('.alert-success').fadeOut('slow');
+            }, 5000);
         });
     </script>
+
+    <!-- Scroll to top button -->
+    <button id="scrollTopBtn" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 999; border: none; background-color: #0d6efd; color: white; cursor: pointer; padding: 12px 16px; border-radius: 8px; font-size: 18px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 }
 
 <style>
-    .font-weight-bold { font-weight: 700; }
+    #scrollTopBtn:hover {
+        background-color: #0257d5;
+    }
 </style>
